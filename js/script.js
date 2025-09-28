@@ -318,7 +318,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			   saveTeams();
 			   editModal.style.display = 'none';
 			   document.body.style.overflow = '';
-			   // Rerender team info
+	       // Rerender team info and keep the same team expanded
+	       const openTeamId = teams[teamIdx].id;
 	       teamInfoContent.innerHTML = '';
 	       teams.forEach((team, i) => {
 		       const teamDiv = document.createElement('div');
@@ -355,6 +356,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			       if (e.key === 'Enter' || e.key === ' ') header.click();
 		       });
 		       teamInfoContent.appendChild(teamDiv);
+		       // Expand the edited team after rerender
+		       if (team.id === openTeamId) {
+			       rosterDiv.style.display = '';
+			       header.querySelector('.expand-arrow').innerHTML = '&#9660;';
+		       }
 	       });
 		};
 	}
