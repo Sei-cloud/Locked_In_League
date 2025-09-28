@@ -319,39 +319,43 @@ document.addEventListener('DOMContentLoaded', function() {
 			   editModal.style.display = 'none';
 			   document.body.style.overflow = '';
 			   // Rerender team info
-			teamInfoContent.innerHTML = '';
-			teams.forEach((team, i) => {
-				const teamDiv = document.createElement('div');
-				teamDiv.className = 'team-block';
-				teamDiv.innerHTML = `
-					<div class="team-header" tabindex="0">
-						<strong>${team.name}</strong> <span class="team-city">(${team.city})</span> - Coach: ${team.coach}
-						<span class="expand-arrow">&#9654;</span>
-					</div>
-					<div class="team-roster" style="display:none;"></div>
-				`;
-				const rosterDiv = teamDiv.querySelector('.team-roster');
-				rosterDiv.innerHTML = `<ul>${team.roster.map((player, idx) =>
-					`<li style=\"display:flex;align-items:center;gap:0.5rem;\">
-						<span class=\"player-link\" tabindex=\"0\" data-team=\"${team.id}\" data-player=\"${idx}\">#${player.number} ${player.name} - ${player.position}</span>
-						<button class=\"edit-player-btn\" data-team=\"${team.id}\" data-player=\"${idx}\" style=\"font-size:0.9em;padding:0.1em 0.5em;\">Edit</button>
-					</li>`
-				).join('')}</ul>`;
-				const header = teamDiv.querySelector('.team-header');
-				header.addEventListener('click', function() {
-					const isOpen = rosterDiv.style.display === '';
-					document.querySelectorAll('.team-roster').forEach(el => el.style.display = 'none');
-					document.querySelectorAll('.expand-arrow').forEach(el => el.innerHTML = '&#9654;');
-					if (!isOpen) {
-						rosterDiv.style.display = '';
-						header.querySelector('.expand-arrow').innerHTML = '&#9660;';
-					}
-				});
-				header.addEventListener('keydown', function(e) {
-					if (e.key === 'Enter' || e.key === ' ') header.click();
-				});
-				teamInfoContent.appendChild(teamDiv);
-			});
+	       teamInfoContent.innerHTML = '';
+	       teams.forEach((team, i) => {
+		       const teamDiv = document.createElement('div');
+		       teamDiv.className = 'team-block';
+		       teamDiv.innerHTML = `
+			       <div class="team-header" tabindex="0">
+				       <strong>${team.name}</strong> <span class="team-city">(${team.city})</span> - Coach: ${team.coach}
+				       <span class="expand-arrow">&#9654;</span>
+			       </div>
+			       <div class="team-roster" style="display:none;"></div>
+		       `;
+		       const rosterDiv = teamDiv.querySelector('.team-roster');
+		       rosterDiv.innerHTML = `
+			       <button class="add-player-btn" data-team="${team.id}" style="margin-bottom:0.7em;font-size:0.95em;">Add Player</button>
+			       <ul>${team.roster.map((player, idx) =>
+				       `<li style=\"display:flex;align-items:center;gap:0.5rem;\">
+					       <span class=\"player-link\" tabindex="0" data-team="${team.id}" data-player="${idx}">#${player.number} ${player.name} - ${player.position}</span>
+					       <button class=\"edit-player-btn\" data-team=\"${team.id}\" data-player=\"${idx}\" style=\"font-size:0.9em;padding:0.1em 0.5em;\">Edit</button>
+					       <button class=\"delete-player-btn\" data-team=\"${team.id}\" data-player=\"${idx}\" style=\"font-size:0.9em;padding:0.1em 0.5em;background:#e53935;\">Delete</button>
+				       </li>`
+			       ).join('')}</ul>
+		       `;
+		       const header = teamDiv.querySelector('.team-header');
+		       header.addEventListener('click', function() {
+			       const isOpen = rosterDiv.style.display === '';
+			       document.querySelectorAll('.team-roster').forEach(el => el.style.display = 'none');
+			       document.querySelectorAll('.expand-arrow').forEach(el => el.innerHTML = '&#9654;');
+			       if (!isOpen) {
+				       rosterDiv.style.display = '';
+				       header.querySelector('.expand-arrow').innerHTML = '&#9660;';
+			       }
+		       });
+		       header.addEventListener('keydown', function(e) {
+			       if (e.key === 'Enter' || e.key === ' ') header.click();
+		       });
+		       teamInfoContent.appendChild(teamDiv);
+	       });
 		};
 	}
 	function hideEditModal() {
