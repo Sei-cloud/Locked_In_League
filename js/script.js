@@ -1,17 +1,138 @@
 document.addEventListener('DOMContentLoaded', function() {
-	const sections = [
-		'boxscore',
-		'roster',
-		'team-info',
-		'player-info',
-		'league-info'
-	];
-	sections.forEach(section => {
-		document.getElementById('nav-' + section)?.addEventListener('click', function(e) {
-			e.preventDefault();
-			sections.forEach(sec => {
-				document.getElementById(sec).style.display = (sec === section) ? '' : 'none';
+		const sections = [
+			'boxscore',
+			'roster',
+			'team-info',
+			'player-info',
+			'league-info'
+		];
+		sections.forEach(section => {
+			document.getElementById('nav-' + section)?.addEventListener('click', function(e) {
+				e.preventDefault();
+				sections.forEach(sec => {
+					document.getElementById(sec).style.display = (sec === section) ? '' : 'none';
+				});
 			});
 		});
-	});
+
+		// Dummy teams and rosters
+		const teams = Array.from({length: 14}, (_, i) => ({
+			id: i+1,
+			name: `Team ${String.fromCharCode(65+i)}`,
+			city: `City ${i+1}`,
+			coach: `Coach ${String.fromCharCode(65+i)}`,
+			roster: Array.from({length: 10}, (_, j) => {
+				const base = i*10 + j;
+				return {
+					name: `Player ${j+1} (${String.fromCharCode(65+i)})`,
+					position: ['G', 'F', 'C'][j%3],
+					number: j+1,
+					height: `${180 + (j%5)*3} cm`,
+					weight: `${75 + (j%7)*2} kg`,
+					age: 19 + (j%5),
+					ppg: (8 + (base%10) + Math.random()*5).toFixed(1),
+					fg: (40 + (base%20) + Math.random()*10).toFixed(1),
+					assists: (2 + (base%5) + Math.random()*2).toFixed(1),
+					rebounds: (3 + (base%6) + Math.random()*2).toFixed(1)
+				}
+			})
+		}));
+
+		// Render teams in Team Info section
+		const teamInfoContent = document.getElementById('team-info-content');
+		teamInfoContent.innerHTML = '';
+		teams.forEach(team => {
+			const teamDiv = document.createElement('div');
+			teamDiv.className = 'team-block';
+			teamDiv.innerHTML = `
+				<div class="team-header" tabindex="0">
+					<strong>${team.name}</strong> <span class="team-city">(${team.city})</span> - Coach: ${team.coach}
+					<span class="expand-arrow">&#9654;</span>
+				</div>
+				<div class="team-roster" style="display:none;"></div>
+			`;
+			// Roster rendering
+			const rosterDiv = teamDiv.querySelector('.team-roster');
+			rosterDiv.innerHTML = `<ul>${team.roster.map((player, idx) =>
+				`<li class="player-link" tabindex="0" data-team="${team.id}" data-player="${idx}">#${player.number} ${player.name} - ${player.position}</li>`
+			).join('')}</ul>`;
+			// Expand/collapse logic
+			const header = teamDiv.querySelector('.team-header');
+			header.addEventListener('click', function() {
+				const isOpen = rosterDiv.style.display === '';
+				document.querySelectorAll('.team-roster').forEach(el => el.style.display = 'none');
+				document.querySelectorAll('.expand-arrow').forEach(el => el.innerHTML = '&#9654;');
+				if (!isOpen) {
+					rosterDiv.style.display = '';
+					header.querySelector('.expand-arrow').innerHTML = '&#9660;';
+				}
+			});
+			header.addEventListener('keydown', function(e) {
+				if (e.key === 'Enter' || e.key === ' ') header.click();
+			});
+			teamInfoContent.appendChild(teamDiv);
+		});
+
+		// Player info popup/modal
+		let playerModal = document.getElementById('player-modal');
+		if (!playerModal) {
+			playerModal = document.createElement('div');
+			playerModal.id = 'player-modal';
+			playerModal.innerHTML = `
+				<div class="modal-bg"></div>
+				<div class="modal-content">
+					<span class="modal-close" tabindex="0">&times;</span>
+					<div id="modal-player-details"></div>
+				</div>
+			`;
+			document.body.appendChild(playerModal);
+		}
+		function showPlayerModal(player) {
+			const details = `
+				<h3>${player.name}</h3>
+				<ul class="player-stats">
+					<li><strong>Position:</strong> ${player.position}</li>
+					<li><strong>Height:</strong> ${player.height}</li>
+					<li><strong>Weight:</strong> ${player.weight}</li>
+					<li><strong>Age:</strong> ${player.age}</li>
+					<li><strong>PPG:</strong> ${player.ppg}</li>
+					<li><strong>FG%:</strong> ${player.fg}</li>
+					<li><strong>APG:</strong> ${player.assists}</li>
+					<li><strong>RPG:</strong> ${player.rebounds}</li>
+				</ul>
+			`;
+			document.getElementById('modal-player-details').innerHTML = details;
+			playerModal.style.display = 'flex';
+			document.body.style.overflow = 'hidden';
+		}
+		function hidePlayerModal() {
+			playerModal.style.display = 'none';
+			document.body.style.overflow = '';
+		}
+		playerModal.querySelector('.modal-bg').addEventListener('click', hidePlayerModal);
+		playerModal.querySelector('.modal-close').addEventListener('click', hidePlayerModal);
+		playerModal.querySelector('.modal-close').addEventListener('keydown', function(e) {
+			if (e.key === 'Enter' || e.key === ' ') hidePlayerModal();
+		});
+		document.addEventListener('keydown', function(e) {
+			if (playerModal.style.display === 'flex' && e.key === 'Escape') hidePlayerModal();
+		});
+
+		// Delegate click for player links
+		teamInfoContent.addEventListener('click', function(e) {
+			if (e.target.classList.contains('player-link')) {
+				const teamId = parseInt(e.target.getAttribute('data-team'));
+				const playerIdx = parseInt(e.target.getAttribute('data-player'));
+				const team = teams.find(t => t.id === teamId);
+				if (team) {
+					const player = team.roster[playerIdx];
+					showPlayerModal(player);
+				}
+			}
+		});
+		teamInfoContent.addEventListener('keydown', function(e) {
+			if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('player-link')) {
+				e.target.click();
+			}
+		});
 });

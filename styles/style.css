@@ -1,3 +1,118 @@
+.player-link {
+	cursor: pointer;
+	color: #1a237e;
+	text-decoration: underline;
+	outline: none;
+	background: none;
+	border: none;
+	padding: 0.1rem 0.2rem;
+	border-radius: 3px;
+	transition: background 0.15s;
+}
+.player-link:hover, .player-link:focus {
+	background: #e3e6f3;
+	color: #ffb300;
+}
+
+#player-modal {
+	display: none;
+	position: fixed;
+	top: 0; left: 0; right: 0; bottom: 0;
+	z-index: 1000;
+	align-items: center;
+	justify-content: center;
+	background: rgba(30,40,100,0.10);
+}
+.modal-bg {
+	position: absolute;
+	top: 0; left: 0; right: 0; bottom: 0;
+	background: rgba(30,40,100,0.18);
+}
+.modal-content {
+	position: relative;
+	background: #fff;
+	border-radius: 10px;
+	box-shadow: 0 4px 24px rgba(30,40,100,0.18);
+	padding: 2rem 2.5rem 1.5rem 2.5rem;
+	min-width: 300px;
+	max-width: 90vw;
+	z-index: 2;
+	animation: modalIn 0.18s cubic-bezier(.4,1.3,.6,1) 1;
+}
+@keyframes modalIn {
+	from { transform: translateY(40px) scale(0.95); opacity: 0; }
+	to { transform: none; opacity: 1; }
+}
+.modal-close {
+	position: absolute;
+	top: 0.7rem;
+	right: 1.2rem;
+	font-size: 2rem;
+	color: #1a237e;
+	cursor: pointer;
+	background: none;
+	border: none;
+	outline: none;
+	transition: color 0.15s;
+}
+.modal-close:hover, .modal-close:focus {
+	color: #ffb300;
+}
+.player-stats {
+	list-style: none;
+	padding: 0;
+	margin: 1rem 0 0 0;
+}
+.player-stats li {
+	margin-bottom: 0.5rem;
+	font-size: 1.05rem;
+}
+.team-block {
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	margin-bottom: 1rem;
+	background: #fafbff;
+	box-shadow: 0 1px 3px rgba(30,40,100,0.04);
+	overflow: hidden;
+}
+.team-header {
+	padding: 1rem;
+	cursor: pointer;
+	background: #283593;
+	color: #fff;
+	font-size: 1.1rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	outline: none;
+}
+.team-header:focus {
+	box-shadow: 0 0 0 2px #ffb300;
+}
+.expand-arrow {
+	margin-left: 1rem;
+	font-size: 1.2rem;
+	transition: transform 0.2s;
+}
+.team-roster {
+	background: #fff;
+	padding: 1rem 2rem;
+	border-top: 1px solid #e0e0e0;
+}
+.team-roster ul {
+	margin: 0;
+	padding: 0 0 0 1.2rem;
+}
+.team-roster li {
+	margin-bottom: 0.4rem;
+	font-size: 1rem;
+	color: #222;
+}
+.team-city {
+	color: #ffb300;
+	margin-left: 0.5rem;
+	font-weight: 400;
+}
 body {
 	font-family: 'Segoe UI', Arial, sans-serif;
 	margin: 0;
