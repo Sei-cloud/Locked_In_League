@@ -6,14 +6,21 @@ document.addEventListener('DOMContentLoaded', function() {
 			'player-info',
 			'league-info'
 		];
-		sections.forEach(section => {
-			document.getElementById('nav-' + section)?.addEventListener('click', function(e) {
-				e.preventDefault();
-				sections.forEach(sec => {
-					document.getElementById(sec).style.display = (sec === section) ? '' : 'none';
-				});
-			});
-		});
+	       // Show last visited section or default to 'boxscore'
+	       let lastSection = localStorage.getItem('lockedInLeagueLastSection') || 'boxscore';
+	       sections.forEach(sec => {
+		       document.getElementById(sec).style.display = (sec === lastSection) ? '' : 'none';
+	       });
+
+	       sections.forEach(section => {
+		       document.getElementById('nav-' + section)?.addEventListener('click', function(e) {
+			       e.preventDefault();
+			       sections.forEach(sec => {
+				       document.getElementById(sec).style.display = (sec === section) ? '' : 'none';
+			       });
+			       localStorage.setItem('lockedInLeagueLastSection', section);
+		       });
+	       });
 
 		// Persistent teams and rosters
 		function getDefaultTeams() {
