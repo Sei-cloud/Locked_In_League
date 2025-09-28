@@ -53,12 +53,209 @@ document.addEventListener('DOMContentLoaded', function() {
 			`;
 			// Roster rendering
 			const rosterDiv = teamDiv.querySelector('.team-roster');
-			rosterDiv.innerHTML = `<ul>${team.roster.map((player, idx) =>
-				`<li style="display:flex;align-items:center;gap:0.5rem;">
-					<span class="player-link" tabindex="0" data-team="${team.id}" data-player="${idx}">#${player.number} ${player.name} - ${player.position}</span>
-					<button class="edit-player-btn" data-team="${team.id}" data-player="${idx}" style="font-size:0.9em;padding:0.1em 0.5em;">Edit</button>
-				</li>`
-			).join('')}</ul>`;
+			rosterDiv.innerHTML = `
+				<button class="add-player-btn" data-team="${team.id}" style="margin-bottom:0.7em;font-size:0.95em;">Add Player</button>
+				<ul>${team.roster.map((player, idx) =>
+					`<li style="display:flex;align-items:center;gap:0.5rem;">
+						<span class="player-link" tabindex="0" data-team="${team.id}" data-player="${idx}">#${player.number} ${player.name} - ${player.position}</span>
+						<button class="edit-player-btn" data-team="${team.id}" data-player="${idx}" style="font-size:0.9em;padding:0.1em 0.5em;">Edit</button>
+						<button class="delete-player-btn" data-team="${team.id}" data-player="${idx}" style="font-size:0.9em;padding:0.1em 0.5em;background:#e53935;">Delete</button>
+					</li>`
+				).join('')}</ul>
+			`;
+	// Add Player modal
+	let addModal = document.getElementById('add-player-modal');
+	if (!addModal) {
+		addModal = document.createElement('div');
+		addModal.id = 'add-player-modal';
+		addModal.innerHTML = `
+			<div class="modal-bg"></div>
+			<div class="modal-content">
+				<span class="modal-close" tabindex="0">&times;</span>
+				<div id="add-player-form-container"></div>
+			</div>
+		`;
+		document.body.appendChild(addModal);
+	}
+	function showAddModal(teamIdx) {
+		const form = `
+			<h3>Add Player</h3>
+			<form id="add-player-form">
+				<label>Name: <input name="name" required></label><br>
+				<label>Position: <input name="position" required></label><br>
+				<label>Number: <input name="number" type="number" min="0" required></label><br>
+				<label>Height: <input name="height" required></label><br>
+				<label>Weight: <input name="weight" required></label><br>
+				<label>Age: <input name="age" type="number" min="0" required></label><br>
+				<label>PPG: <input name="ppg" type="number" step="0.1" required></label><br>
+				<label>FG%: <input name="fg" type="number" step="0.1" required></label><br>
+				<label>Assists Avg: <input name="assists" type="number" step="0.1" required></label><br>
+				<label>Rebounds Avg: <input name="rebounds" type="number" step="0.1" required></label><br>
+				<button type="submit">Add</button>
+			</form>
+		`;
+		document.getElementById('add-player-form-container').innerHTML = form;
+		addModal.style.display = 'flex';
+		document.body.style.overflow = 'hidden';
+		document.getElementById('add-player-form').onsubmit = function(e) {
+			e.preventDefault();
+			const data = Object.fromEntries(new FormData(this).entries());
+			teams[teamIdx].roster.push(data);
+			addModal.style.display = 'none';
+			document.body.style.overflow = '';
+			// Rerender team info
+			teamInfoContent.innerHTML = '';
+			teams.forEach((team, i) => {
+				const teamDiv = document.createElement('div');
+				teamDiv.className = 'team-block';
+				teamDiv.innerHTML = `
+					<div class="team-header" tabindex="0">
+						<strong>${team.name}</strong> <span class="team-city">(${team.city})</span> - Coach: ${team.coach}
+						<span class="expand-arrow">&#9654;</span>
+					</div>
+					<div class="team-roster" style="display:none;"></div>
+				`;
+				const rosterDiv = teamDiv.querySelector('.team-roster');
+				rosterDiv.innerHTML = `
+					<button class=\"add-player-btn\" data-team=\"${team.id}\" style=\"margin-bottom:0.7em;font-size:0.95em;\">Add Player</button>
+					<ul>${team.roster.map((player, idx) =>
+						`<li style=\"display:flex;align-items:center;gap:0.5rem;\">
+							<span class=\"player-link\" tabindex=\"0\" data-team=\"${team.id}\" data-player=\"${idx}\">#${player.number} ${player.name} - ${player.position}</span>
+							<button class=\"edit-player-btn\" data-team=\"${team.id}\" data-player=\"${idx}\" style=\"font-size:0.9em;padding:0.1em 0.5em;\">Edit</button>
+							<button class=\"delete-player-btn\" data-team=\"${team.id}\" data-player=\"${idx}\" style=\"font-size:0.9em;padding:0.1em 0.5em;background:#e53935;\">Delete</button>
+						</li>`
+					).join('')}</ul>
+				`;
+				const header = teamDiv.querySelector('.team-header');
+				header.addEventListener('click', function() {
+					const isOpen = rosterDiv.style.display === '';
+					document.querySelectorAll('.team-roster').forEach(el => el.style.display = 'none');
+					document.querySelectorAll('.expand-arrow').forEach(el => el.innerHTML = '&#9654;');
+					if (!isOpen) {
+						rosterDiv.style.display = '';
+						header.querySelector('.expand-arrow').innerHTML = '&#9660;';
+					}
+				});
+				header.addEventListener('keydown', function(e) {
+					if (e.key === 'Enter' || e.key === ' ') header.click();
+				});
+				teamInfoContent.appendChild(teamDiv);
+			});
+		};
+	}
+	function hideAddModal() {
+		addModal.style.display = 'none';
+		document.body.style.overflow = '';
+	}
+	addModal.querySelector('.modal-bg').addEventListener('click', hideAddModal);
+	addModal.querySelector('.modal-close').addEventListener('click', hideAddModal);
+	addModal.querySelector('.modal-close').addEventListener('keydown', function(e) {
+		if (e.key === 'Enter' || e.key === ' ') hideAddModal();
+	});
+	document.addEventListener('keydown', function(e) {
+		if (addModal.style.display === 'flex' && e.key === 'Escape') hideAddModal();
+	});
+
+	// Delete Player modal
+	let deleteModal = document.getElementById('delete-player-modal');
+	if (!deleteModal) {
+		deleteModal = document.createElement('div');
+		deleteModal.id = 'delete-player-modal';
+		deleteModal.innerHTML = `
+			<div class="modal-bg"></div>
+			<div class="modal-content">
+				<span class="modal-close" tabindex="0">&times;</span>
+				<div id="delete-player-form-container"></div>
+			</div>
+		`;
+		document.body.appendChild(deleteModal);
+	}
+	function showDeleteModal(teamIdx, playerIdx) {
+		const player = teams[teamIdx].roster[playerIdx];
+		const form = `
+			<h3>Delete Player</h3>
+			<p>Are you sure you want to delete <strong>${player.name}</strong>?</p>
+			<button id="confirm-delete-player">Delete</button>
+			<button id="cancel-delete-player" type="button">Cancel</button>
+		`;
+		document.getElementById('delete-player-form-container').innerHTML = form;
+		deleteModal.style.display = 'flex';
+		document.body.style.overflow = 'hidden';
+		document.getElementById('confirm-delete-player').onclick = function() {
+			teams[teamIdx].roster.splice(playerIdx, 1);
+			deleteModal.style.display = 'none';
+			document.body.style.overflow = '';
+			// Rerender team info
+			teamInfoContent.innerHTML = '';
+			teams.forEach((team, i) => {
+				const teamDiv = document.createElement('div');
+				teamDiv.className = 'team-block';
+				teamDiv.innerHTML = `
+					<div class="team-header" tabindex="0">
+						<strong>${team.name}</strong> <span class="team-city">(${team.city})</span> - Coach: ${team.coach}
+						<span class="expand-arrow">&#9654;</span>
+					</div>
+					<div class="team-roster" style="display:none;"></div>
+				`;
+				const rosterDiv = teamDiv.querySelector('.team-roster');
+				rosterDiv.innerHTML = `
+					<button class=\"add-player-btn\" data-team=\"${team.id}\" style=\"margin-bottom:0.7em;font-size:0.95em;\">Add Player</button>
+					<ul>${team.roster.map((player, idx) =>
+						`<li style=\"display:flex;align-items:center;gap:0.5rem;\">
+							<span class=\"player-link\" tabindex=\"0\" data-team=\"${team.id}\" data-player=\"${idx}\">#${player.number} ${player.name} - ${player.position}</span>
+							<button class=\"edit-player-btn\" data-team=\"${team.id}\" data-player=\"${idx}\" style=\"font-size:0.9em;padding:0.1em 0.5em;\">Edit</button>
+							<button class=\"delete-player-btn\" data-team=\"${team.id}\" data-player=\"${idx}\" style=\"font-size:0.9em;padding:0.1em 0.5em;background:#e53935;\">Delete</button>
+						</li>`
+					).join('')}</ul>
+				`;
+				const header = teamDiv.querySelector('.team-header');
+				header.addEventListener('click', function() {
+					const isOpen = rosterDiv.style.display === '';
+					document.querySelectorAll('.team-roster').forEach(el => el.style.display = 'none');
+					document.querySelectorAll('.expand-arrow').forEach(el => el.innerHTML = '&#9654;');
+					if (!isOpen) {
+						rosterDiv.style.display = '';
+						header.querySelector('.expand-arrow').innerHTML = '&#9660;';
+					}
+				});
+				header.addEventListener('keydown', function(e) {
+					if (e.key === 'Enter' || e.key === ' ') header.click();
+				});
+				teamInfoContent.appendChild(teamDiv);
+			});
+		};
+		document.getElementById('cancel-delete-player').onclick = function() {
+			deleteModal.style.display = 'none';
+			document.body.style.overflow = '';
+		};
+	}
+	function hideDeleteModal() {
+		deleteModal.style.display = 'none';
+		document.body.style.overflow = '';
+	}
+	deleteModal.querySelector('.modal-bg').addEventListener('click', hideDeleteModal);
+	deleteModal.querySelector('.modal-close').addEventListener('click', hideDeleteModal);
+	deleteModal.querySelector('.modal-close').addEventListener('keydown', function(e) {
+		if (e.key === 'Enter' || e.key === ' ') hideDeleteModal();
+	});
+	document.addEventListener('keydown', function(e) {
+		if (deleteModal.style.display === 'flex' && e.key === 'Escape') hideDeleteModal();
+	});
+
+	// Delegate click for add and delete buttons
+	teamInfoContent.addEventListener('click', function(e) {
+		if (e.target.classList.contains('add-player-btn')) {
+			const teamId = parseInt(e.target.getAttribute('data-team'));
+			const teamIdx = teams.findIndex(t => t.id === teamId);
+			showAddModal(teamIdx);
+		}
+		if (e.target.classList.contains('delete-player-btn')) {
+			const teamId = parseInt(e.target.getAttribute('data-team'));
+			const playerIdx = parseInt(e.target.getAttribute('data-player'));
+			const teamIdx = teams.findIndex(t => t.id === teamId);
+			showDeleteModal(teamIdx, playerIdx);
+		}
+	});
 	// Player edit modal
 	let editModal = document.getElementById('edit-player-modal');
 	if (!editModal) {
