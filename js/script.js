@@ -54,8 +54,110 @@ document.addEventListener('DOMContentLoaded', function() {
 			// Roster rendering
 			const rosterDiv = teamDiv.querySelector('.team-roster');
 			rosterDiv.innerHTML = `<ul>${team.roster.map((player, idx) =>
-				`<li class="player-link" tabindex="0" data-team="${team.id}" data-player="${idx}">#${player.number} ${player.name} - ${player.position}</li>`
+				`<li style="display:flex;align-items:center;gap:0.5rem;">
+					<span class="player-link" tabindex="0" data-team="${team.id}" data-player="${idx}">#${player.number} ${player.name} - ${player.position}</span>
+					<button class="edit-player-btn" data-team="${team.id}" data-player="${idx}" style="font-size:0.9em;padding:0.1em 0.5em;">Edit</button>
+				</li>`
 			).join('')}</ul>`;
+	// Player edit modal
+	let editModal = document.getElementById('edit-player-modal');
+	if (!editModal) {
+		editModal = document.createElement('div');
+		editModal.id = 'edit-player-modal';
+		editModal.innerHTML = `
+			<div class="modal-bg"></div>
+			<div class="modal-content">
+				<span class="modal-close" tabindex="0">&times;</span>
+				<div id="edit-player-form-container"></div>
+			</div>
+		`;
+		document.body.appendChild(editModal);
+	}
+	function showEditModal(teamIdx, playerIdx) {
+		const player = teams[teamIdx].roster[playerIdx];
+		const form = `
+			<h3>Edit Player</h3>
+			<form id="edit-player-form">
+				<label>Name: <input name="name" value="${player.name}" required></label><br>
+				<label>Position: <input name="position" value="${player.position}" required></label><br>
+				<label>Number: <input name="number" type="number" min="0" value="${player.number}" required></label><br>
+				<label>Height: <input name="height" value="${player.height}" required></label><br>
+				<label>Weight: <input name="weight" value="${player.weight}" required></label><br>
+				<label>Age: <input name="age" type="number" min="0" value="${player.age}" required></label><br>
+				<label>PPG: <input name="ppg" type="number" step="0.1" value="${player.ppg}" required></label><br>
+				<label>FG%: <input name="fg" type="number" step="0.1" value="${player.fg}" required></label><br>
+				<label>Assists Avg: <input name="assists" type="number" step="0.1" value="${player.assists}" required></label><br>
+				<label>Rebounds Avg: <input name="rebounds" type="number" step="0.1" value="${player.rebounds}" required></label><br>
+				<button type="submit">Save</button>
+			</form>
+		`;
+		document.getElementById('edit-player-form-container').innerHTML = form;
+		editModal.style.display = 'flex';
+		document.body.style.overflow = 'hidden';
+		document.getElementById('edit-player-form').onsubmit = function(e) {
+			e.preventDefault();
+			const data = Object.fromEntries(new FormData(this).entries());
+			Object.assign(teams[teamIdx].roster[playerIdx], data);
+			editModal.style.display = 'none';
+			document.body.style.overflow = '';
+			// Rerender team info
+			teamInfoContent.innerHTML = '';
+			teams.forEach((team, i) => {
+				const teamDiv = document.createElement('div');
+				teamDiv.className = 'team-block';
+				teamDiv.innerHTML = `
+					<div class="team-header" tabindex="0">
+						<strong>${team.name}</strong> <span class="team-city">(${team.city})</span> - Coach: ${team.coach}
+						<span class="expand-arrow">&#9654;</span>
+					</div>
+					<div class="team-roster" style="display:none;"></div>
+				`;
+				const rosterDiv = teamDiv.querySelector('.team-roster');
+				rosterDiv.innerHTML = `<ul>${team.roster.map((player, idx) =>
+					`<li style=\"display:flex;align-items:center;gap:0.5rem;\">
+						<span class=\"player-link\" tabindex=\"0\" data-team=\"${team.id}\" data-player=\"${idx}\">#${player.number} ${player.name} - ${player.position}</span>
+						<button class=\"edit-player-btn\" data-team=\"${team.id}\" data-player=\"${idx}\" style=\"font-size:0.9em;padding:0.1em 0.5em;\">Edit</button>
+					</li>`
+				).join('')}</ul>`;
+				const header = teamDiv.querySelector('.team-header');
+				header.addEventListener('click', function() {
+					const isOpen = rosterDiv.style.display === '';
+					document.querySelectorAll('.team-roster').forEach(el => el.style.display = 'none');
+					document.querySelectorAll('.expand-arrow').forEach(el => el.innerHTML = '&#9654;');
+					if (!isOpen) {
+						rosterDiv.style.display = '';
+						header.querySelector('.expand-arrow').innerHTML = '&#9660;';
+					}
+				});
+				header.addEventListener('keydown', function(e) {
+					if (e.key === 'Enter' || e.key === ' ') header.click();
+				});
+				teamInfoContent.appendChild(teamDiv);
+			});
+		};
+	}
+	function hideEditModal() {
+		editModal.style.display = 'none';
+		document.body.style.overflow = '';
+	}
+	editModal.querySelector('.modal-bg').addEventListener('click', hideEditModal);
+	editModal.querySelector('.modal-close').addEventListener('click', hideEditModal);
+	editModal.querySelector('.modal-close').addEventListener('keydown', function(e) {
+		if (e.key === 'Enter' || e.key === ' ') hideEditModal();
+	});
+	document.addEventListener('keydown', function(e) {
+		if (editModal.style.display === 'flex' && e.key === 'Escape') hideEditModal();
+	});
+
+	// Delegate click for edit buttons
+	teamInfoContent.addEventListener('click', function(e) {
+		if (e.target.classList.contains('edit-player-btn')) {
+			const teamId = parseInt(e.target.getAttribute('data-team'));
+			const playerIdx = parseInt(e.target.getAttribute('data-player'));
+			const teamIdx = teams.findIndex(t => t.id === teamId);
+			showEditModal(teamIdx, playerIdx);
+		}
+	});
 			// Expand/collapse logic
 			const header = teamDiv.querySelector('.team-header');
 			header.addEventListener('click', function() {

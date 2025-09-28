@@ -1,3 +1,83 @@
+.edit-player-btn {
+	background: #ffb300;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background 0.15s;
+	font-weight: 500;
+}
+.edit-player-btn:hover, .edit-player-btn:focus {
+	background: #ffa000;
+	outline: none;
+}
+#edit-player-modal {
+	display: none;
+	position: fixed;
+	top: 0; left: 0; right: 0; bottom: 0;
+	z-index: 1100;
+	align-items: center;
+	justify-content: center;
+	background: rgba(30,40,100,0.10);
+}
+#edit-player-modal .modal-bg {
+	position: absolute;
+	top: 0; left: 0; right: 0; bottom: 0;
+	background: rgba(30,40,100,0.18);
+}
+#edit-player-modal .modal-content {
+	position: relative;
+	background: #fff;
+	border-radius: 10px;
+	box-shadow: 0 4px 24px rgba(30,40,100,0.18);
+	padding: 2rem 2.5rem 1.5rem 2.5rem;
+	min-width: 300px;
+	max-width: 90vw;
+	z-index: 2;
+	animation: modalIn 0.18s cubic-bezier(.4,1.3,.6,1) 1;
+}
+#edit-player-modal .modal-close {
+	position: absolute;
+	top: 0.7rem;
+	right: 1.2rem;
+	font-size: 2rem;
+	color: #1a237e;
+	cursor: pointer;
+	background: none;
+	border: none;
+	outline: none;
+	transition: color 0.15s;
+}
+#edit-player-modal .modal-close:hover, #edit-player-modal .modal-close:focus {
+	color: #ffb300;
+}
+#edit-player-modal label {
+	display: block;
+	margin-bottom: 0.5rem;
+	color: #283593;
+	font-size: 1rem;
+}
+#edit-player-modal input {
+	margin-left: 0.5rem;
+	font-size: 1rem;
+	border-radius: 3px;
+	border: 1px solid #bdbdbd;
+	padding: 0.1rem 0.3rem;
+}
+#edit-player-modal button[type="submit"] {
+	margin-top: 1rem;
+	background: #1a237e;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	padding: 0.4em 1.2em;
+	font-size: 1.05em;
+	cursor: pointer;
+	transition: background 0.15s;
+}
+#edit-player-modal button[type="submit"]:hover, #edit-player-modal button[type="submit"]:focus {
+	background: #3949ab;
+}
 .player-link {
 	cursor: pointer;
 	color: #1a237e;
