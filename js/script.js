@@ -15,28 +15,39 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 		});
 
-		// Dummy teams and rosters
-		const teams = Array.from({length: 14}, (_, i) => ({
-			id: i+1,
-			name: `Team ${String.fromCharCode(65+i)}`,
-			city: `City ${i+1}`,
-			coach: `Coach ${String.fromCharCode(65+i)}`,
-			roster: Array.from({length: 10}, (_, j) => {
-				const base = i*10 + j;
-				return {
-					name: `Player ${j+1} (${String.fromCharCode(65+i)})`,
-					position: ['G', 'F', 'C'][j%3],
-					number: j+1,
-					height: `${180 + (j%5)*3} cm`,
-					weight: `${75 + (j%7)*2} kg`,
-					age: 19 + (j%5),
-					ppg: (8 + (base%10) + Math.random()*5).toFixed(1),
-					fg: (40 + (base%20) + Math.random()*10).toFixed(1),
-					assists: (2 + (base%5) + Math.random()*2).toFixed(1),
-					rebounds: (3 + (base%6) + Math.random()*2).toFixed(1)
-				}
-			})
-		}));
+		// Persistent teams and rosters
+		function getDefaultTeams() {
+			return Array.from({length: 14}, (_, i) => ({
+				id: i+1,
+				name: `Team ${String.fromCharCode(65+i)}`,
+				city: `City ${i+1}`,
+				coach: `Coach ${String.fromCharCode(65+i)}`,
+				roster: Array.from({length: 10}, (_, j) => {
+					const base = i*10 + j;
+					return {
+						name: `Player ${j+1} (${String.fromCharCode(65+i)})`,
+						position: ['G', 'F', 'C'][j%3],
+						number: j+1,
+						height: `${180 + (j%5)*3} cm`,
+						weight: `${75 + (j%7)*2} kg`,
+						age: 19 + (j%5),
+						ppg: (8 + (base%10) + Math.random()*5).toFixed(1),
+						fg: (40 + (base%20) + Math.random()*10).toFixed(1),
+						assists: (2 + (base%5) + Math.random()*2).toFixed(1),
+						rebounds: (3 + (base%6) + Math.random()*2).toFixed(1)
+					}
+				})
+			}));
+		}
+		function saveTeams() {
+			localStorage.setItem('lockedInLeagueTeams', JSON.stringify(teams));
+		}
+		function loadTeams() {
+			const data = localStorage.getItem('lockedInLeagueTeams');
+			if (data) return JSON.parse(data);
+			return getDefaultTeams();
+		}
+		let teams = loadTeams();
 
 		// Render teams in Team Info section
 		const teamInfoContent = document.getElementById('team-info-content');
@@ -101,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			e.preventDefault();
 			const data = Object.fromEntries(new FormData(this).entries());
 			teams[teamIdx].roster.push(data);
+			saveTeams();
 			addModal.style.display = 'none';
 			document.body.style.overflow = '';
 			// Rerender team info
@@ -182,10 +194,11 @@ document.addEventListener('DOMContentLoaded', function() {
 		deleteModal.style.display = 'flex';
 		document.body.style.overflow = 'hidden';
 		document.getElementById('confirm-delete-player').onclick = function() {
-			teams[teamIdx].roster.splice(playerIdx, 1);
-			deleteModal.style.display = 'none';
-			document.body.style.overflow = '';
-			// Rerender team info
+			   teams[teamIdx].roster.splice(playerIdx, 1);
+			   saveTeams();
+			   deleteModal.style.display = 'none';
+			   document.body.style.overflow = '';
+			   // Rerender team info
 			teamInfoContent.innerHTML = '';
 			teams.forEach((team, i) => {
 				const teamDiv = document.createElement('div');
@@ -294,10 +307,11 @@ document.addEventListener('DOMContentLoaded', function() {
 		document.getElementById('edit-player-form').onsubmit = function(e) {
 			e.preventDefault();
 			const data = Object.fromEntries(new FormData(this).entries());
-			Object.assign(teams[teamIdx].roster[playerIdx], data);
-			editModal.style.display = 'none';
-			document.body.style.overflow = '';
-			// Rerender team info
+			   Object.assign(teams[teamIdx].roster[playerIdx], data);
+			   saveTeams();
+			   editModal.style.display = 'none';
+			   document.body.style.overflow = '';
+			   // Rerender team info
 			teamInfoContent.innerHTML = '';
 			teams.forEach((team, i) => {
 				const teamDiv = document.createElement('div');
