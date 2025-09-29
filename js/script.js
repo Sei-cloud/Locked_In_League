@@ -61,6 +61,78 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   let teams = loadTeams();
 
+
+
+
+// Rerender team info
+function rerenderTeamInfo(openTeamId = null) {
+  teamInfoContent.innerHTML = "";
+  teams.forEach((team) => {
+    const teamDiv = document.createElement("div");
+    teamDiv.className = "team-block";
+    teamDiv.innerHTML = `
+      <div class="team-header" tabindex="0">
+        <strong>${team.name}</strong> <span class="team-city">(${team.city})</span> - Coach: ${team.coach}
+        <span class="expand-arrow">&#9654;</span>
+      </div>
+      <div class="team-roster" style="display:none;">
+        <button class="add-player-btn" data-team="${team.id}" style="margin-bottom:0.7em;font-size:0.95em;">Add Player</button>
+        <ul>
+          ${team.roster
+            .map(
+              (player, idx) => `
+                <li style="display:flex;align-items:center;gap:0.5rem;">
+                  <span class="player-link" tabindex="0" data-team="${team.id}" data-player="${idx}">
+                    #${player.number} ${player.name} - ${player.position}
+                  </span>
+                  <button class="edit-player-btn" data-team="${team.id}" data-player="${idx}" style="font-size:0.9em;padding:0.1em 0.5em;">Edit</button>
+                  <button class="delete-player-btn" data-team="${team.id}" data-player="${idx}" style="font-size:0.9em;padding:0.1em 0.5em;background:#e53935;">Delete</button>
+                </li>`
+            )
+            .join("")}
+        </ul>
+      </div>
+    `;
+
+    const rosterDiv = teamDiv.querySelector(".team-roster");
+    const header = teamDiv.querySelector(".team-header");
+
+    // Expand/collapse
+    header.addEventListener("click", () => {
+      const isOpen = rosterDiv.style.display === "";
+      document.querySelectorAll(".team-roster").forEach((el) => (el.style.display = "none"));
+      document.querySelectorAll(".expand-arrow").forEach((el) => (el.innerHTML = "&#9654;"));
+      if (!isOpen) {
+        rosterDiv.style.display = "";
+        header.querySelector(".expand-arrow").innerHTML = "&#9660;";
+      }
+    });
+    header.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") header.click();
+    });
+
+    // Auto-expand modified team
+    if (openTeamId && team.id === openTeamId) {
+      rosterDiv.style.display = "";
+      header.querySelector(".expand-arrow").innerHTML = "&#9660;";
+    }
+
+    teamInfoContent.appendChild(teamDiv);
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
   // Render teams in Team Info section
   const teamInfoContent = document.getElementById("team-info-content");
   teamInfoContent.innerHTML = "";
@@ -132,61 +204,10 @@ document.addEventListener("DOMContentLoaded", function () {
         saveTeams();
         addModal.style.display = "none";
         document.body.style.overflow = "";
-        // Rerender team info
-        const openTeamId = teams[teamIdx].id; // track the team we added a player to
-        teamInfoContent.innerHTML = "";
-        teams.forEach((team, i) => {
-          const teamDiv = document.createElement("div");
-          teamDiv.className = "team-block";
-          teamDiv.innerHTML = `
-        <div class="team-header" tabindex="0">
-            <strong>${team.name}</strong> <span class="team-city">(${team.city})</span> - Coach: ${team.coach}
-            <span class="expand-arrow">&#9654;</span>
-        </div>
-        <div class="team-roster" style="display:none;"></div>
-    `;
-          const rosterDiv = teamDiv.querySelector(".team-roster");
-          rosterDiv.innerHTML = `
-        <button class="add-player-btn" data-team="${
-          team.id
-        }" style="margin-bottom:0.7em;font-size:0.95em;">Add Player</button>
-        <ul>${team.roster
-          .map(
-            (player, idx) =>
-              `<li style="display:flex;align-items:center;gap:0.5rem;">
-                <span class="player-link" tabindex="0" data-team="${team.id}" data-player="${idx}">#${player.number} ${player.name} - ${player.position}</span>
-                <button class="edit-player-btn" data-team="${team.id}" data-player="${idx}" style="font-size:0.9em;padding:0.1em 0.5em;">Edit</button>
-                <button class="delete-player-btn" data-team="${team.id}" data-player="${idx}" style="font-size:0.9em;padding:0.1em 0.5em;background:#e53935;">Delete</button>
-            </li>`
-          )
-          .join("")}</ul>
-    `;
-          const header = teamDiv.querySelector(".team-header");
-          header.addEventListener("click", function () {
-            const isOpen = rosterDiv.style.display === "";
-            document
-              .querySelectorAll(".team-roster")
-              .forEach((el) => (el.style.display = "none"));
-            document
-              .querySelectorAll(".expand-arrow")
-              .forEach((el) => (el.innerHTML = "&#9654;"));
-            if (!isOpen) {
-              rosterDiv.style.display = "";
-              header.querySelector(".expand-arrow").innerHTML = "&#9660;";
-            }
-          });
-          header.addEventListener("keydown", function (e) {
-            if (e.key === "Enter" || e.key === " ") header.click();
-          });
-          teamInfoContent.appendChild(teamDiv);
-
-          // Expand the team where player was added
-          if (team.id === openTeamId) {
-            rosterDiv.style.display = "";
-            header.querySelector(".expand-arrow").innerHTML = "&#9660;";
-          }
-        });
-      };
+       
+		// Rerender team info
+       rerenderTeamInfo(teams[teamIdx].id);
+	  }
     }
     function hideAddModal() {
       addModal.style.display = "none";
@@ -236,60 +257,12 @@ document.addEventListener("DOMContentLoaded", function () {
         saveTeams();
         deleteModal.style.display = "none";
         document.body.style.overflow = "";
-        // Rerender team info
-        const openTeamId = teams[teamIdx].id; // track the team we deleted a player from
-        teamInfoContent.innerHTML = "";
-        teams.forEach((team, i) => {
-          const teamDiv = document.createElement("div");
-          teamDiv.className = "team-block";
-          teamDiv.innerHTML = `
-        <div class="team-header" tabindex="0">
-            <strong>${team.name}</strong> <span class="team-city">(${team.city})</span> - Coach: ${team.coach}
-            <span class="expand-arrow">&#9654;</span>
-        </div>
-        <div class="team-roster" style="display:none;"></div>
-    `;
-          const rosterDiv = teamDiv.querySelector(".team-roster");
-          rosterDiv.innerHTML = `
-        <button class="add-player-btn" data-team="${
-          team.id
-        }" style="margin-bottom:0.7em;font-size:0.95em;">Add Player</button>
-        <ul>${team.roster
-          .map(
-            (player, idx) =>
-              `<li style="display:flex;align-items:center;gap:0.5rem;">
-                <span class="player-link" tabindex="0" data-team="${team.id}" data-player="${idx}">#${player.number} ${player.name} - ${player.position}</span>
-                <button class="edit-player-btn" data-team="${team.id}" data-player="${idx}" style="font-size:0.9em;padding:0.1em 0.5em;">Edit</button>
-                <button class="delete-player-btn" data-team="${team.id}" data-player="${idx}" style="font-size:0.9em;padding:0.1em 0.5em;background:#e53935;">Delete</button>
-            </li>`
-          )
-          .join("")}</ul>
-    `;
-          const header = teamDiv.querySelector(".team-header");
-          header.addEventListener("click", function () {
-            const isOpen = rosterDiv.style.display === "";
-            document
-              .querySelectorAll(".team-roster")
-              .forEach((el) => (el.style.display = "none"));
-            document
-              .querySelectorAll(".expand-arrow")
-              .forEach((el) => (el.innerHTML = "&#9654;"));
-            if (!isOpen) {
-              rosterDiv.style.display = "";
-              header.querySelector(".expand-arrow").innerHTML = "&#9660;";
-            }
-          });
-          header.addEventListener("keydown", function (e) {
-            if (e.key === "Enter" || e.key === " ") header.click();
-          });
-          teamInfoContent.appendChild(teamDiv);
+       
+		
+		// Rerender team info
+       rerenderTeamInfo(teams[teamIdx].id);
 
-          // Expand the team where player was deleted
-          if (team.id === openTeamId) {
-            rosterDiv.style.display = "";
-            header.querySelector(".expand-arrow").innerHTML = "&#9660;";
-          }
-        });
+
       };
       document.getElementById("cancel-delete-player").onclick = function () {
         deleteModal.style.display = "none";
@@ -372,59 +345,9 @@ document.addEventListener("DOMContentLoaded", function () {
         saveTeams();
         editModal.style.display = "none";
         document.body.style.overflow = "";
-        // Rerender team info and keep the same team expanded
-        const openTeamId = teams[teamIdx].id;
-        teamInfoContent.innerHTML = "";
-        teams.forEach((team, i) => {
-          const teamDiv = document.createElement("div");
-          teamDiv.className = "team-block";
-          teamDiv.innerHTML = `
-			       <div class="team-header" tabindex="0">
-				       <strong>${team.name}</strong> <span class="team-city">(${team.city})</span> - Coach: ${team.coach}
-				       <span class="expand-arrow">&#9654;</span>
-			       </div>
-			       <div class="team-roster" style="display:none;"></div>
-		       `;
-          const rosterDiv = teamDiv.querySelector(".team-roster");
-          rosterDiv.innerHTML = `
-			       <button class="add-player-btn" data-team="${
-               team.id
-             }" style="margin-bottom:0.7em;font-size:0.95em;">Add Player</button>
-			       <ul>${team.roster
-               .map(
-                 (player, idx) =>
-                   `<li style=\"display:flex;align-items:center;gap:0.5rem;\">
-					       <span class=\"player-link\" tabindex="0" data-team="${team.id}" data-player="${idx}">#${player.number} ${player.name} - ${player.position}</span>
-					       <button class=\"edit-player-btn\" data-team=\"${team.id}\" data-player=\"${idx}\" style=\"font-size:0.9em;padding:0.1em 0.5em;\">Edit</button>
-					       <button class=\"delete-player-btn\" data-team=\"${team.id}\" data-player=\"${idx}\" style=\"font-size:0.9em;padding:0.1em 0.5em;background:#e53935;\">Delete</button>
-				       </li>`
-               )
-               .join("")}</ul>
-		       `;
-          const header = teamDiv.querySelector(".team-header");
-          header.addEventListener("click", function () {
-            const isOpen = rosterDiv.style.display === "";
-            document
-              .querySelectorAll(".team-roster")
-              .forEach((el) => (el.style.display = "none"));
-            document
-              .querySelectorAll(".expand-arrow")
-              .forEach((el) => (el.innerHTML = "&#9654;"));
-            if (!isOpen) {
-              rosterDiv.style.display = "";
-              header.querySelector(".expand-arrow").innerHTML = "&#9660;";
-            }
-          });
-          header.addEventListener("keydown", function (e) {
-            if (e.key === "Enter" || e.key === " ") header.click();
-          });
-          teamInfoContent.appendChild(teamDiv);
-          // Expand the edited team after rerender
-          if (team.id === openTeamId) {
-            rosterDiv.style.display = "";
-            header.querySelector(".expand-arrow").innerHTML = "&#9660;";
-          }
-        });
+        
+		// Rerender team info
+       rerenderTeamInfo(teams[teamIdx].id);
       };
     }
     function hideEditModal() {
