@@ -1,5 +1,33 @@
 // public/js/script.js (or js/script.js)
 document.addEventListener("DOMContentLoaded", function () {
+  // Add Team button and modal logic
+  document.getElementById('add-team-btn').addEventListener('click', () => {
+    const modal = document.getElementById('player-modal');
+    if (!modal) return;
+    const container = modal.querySelector('.player-stats');
+    container.innerHTML = `
+      <h3 style="margin-bottom:1em;text-align:center;">Add Team</h3>
+      <form id="add-team-form" style="display:flex;flex-direction:column;gap:0.7em;max-width:350px;margin:auto;">
+        <label style="display:flex;flex-direction:column;font-weight:500;">Team Name: <input name="name" required style="padding:0.4em;margin-top:0.2em;"></label>
+        <button type="submit" style="margin-top:1em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:1em;cursor:pointer;">Add</button>
+      </form>
+    `;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    const form = container.querySelector('#add-team-form');
+    form.onsubmit = async function(ev) {
+      ev.preventDefault();
+      const formData = new FormData(form);
+      const payload = { name: formData.get('name'), roster: [] };
+      try {
+        await createTeam(payload);
+        teams = await fetchTeams();
+        rerenderTeamInfo();
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      } catch (err) { console.error(err); alert('Failed to add team'); }
+    };
+  });
   const API_BASE = (window.location.hostname === 'localhost') ? 'http://localhost:4000' : ''; // adjust if hosted elsewhere
 
   const sections = ["boxscore","roster","team-info","player-info","league-info"];
@@ -73,9 +101,9 @@ document.addEventListener("DOMContentLoaded", function () {
           <span class="expand-arrow" style="margin-left:auto;font-size:1.2em;cursor:pointer;">&#9654;</span>
         </div>
         <div class="team-roster" style="display:none;">
-          <button class="add-player-btn" data-team="${team._id}" style="margin-bottom:0.7em;font-size:0.95em;">Add Player</button>
-          <button class="edit-team-btn" data-team="${team._id}" style="margin-left:0.5em;">Edit Team</button>
-          <button class="delete-team-btn" data-team="${team._id}" style="margin-left:0.5em;background:#e53935;color:#fff;">Delete Team</button>
+          <button class="add-player-btn" data-team="${team._id}" style="margin-bottom:0.7em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:0.95em;cursor:pointer;">Add Player</button>
+          <button class="edit-team-btn" data-team="${team._id}" style="margin-left:0.5em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:0.95em;cursor:pointer;">Edit Team</button>
+          <button class="delete-team-btn" data-team="${team._id}" style="margin-left:0.5em;padding:0.6em 1.2em;background:#e53935;color:#fff;border:none;border-radius:4px;font-size:0.95em;cursor:pointer;">Delete Team</button>
           <ul style="margin-top:0.7em;">
             ${team.roster.map((p, idx) => `
               <li style="display:flex;align-items:center;gap:0.5rem;">
@@ -153,19 +181,19 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!modal) return;
       const container = modal.querySelector('.player-stats');
       container.innerHTML = `
-        <h3>Add Player</h3>
-        <form id="add-player-form">
-          <label>Name: <input name="name" required></label><br>
-          <label>Position: <input name="position"></label><br>
-          <label>Number: <input name="number" type="number"></label><br>
-          <label>Height: <input name="height"></label><br>
-          <label>Weight: <input name="weight"></label><br>
-          <label>Age: <input name="age" type="number"></label><br>
-          <label>PPG: <input name="ppg" type="number" step="any"></label><br>
-          <label>FG%: <input name="fg" type="number" step="any"></label><br>
-          <label>APG: <input name="assists" type="number" step="any"></label><br>
-          <label>RPG: <input name="rebounds" type="number" step="any"></label><br>
-          <button type="submit">Add</button>
+        <h3 style="margin-bottom:1em;text-align:center;">Add Player</h3>
+        <form id="add-player-form" style="display:flex;flex-direction:column;gap:0.7em;max-width:350px;margin:auto;">
+          <label style="display:flex;flex-direction:column;font-weight:500;">Name: <input name="name" required style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">Position: <input name="position" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">Number: <input name="number" type="number" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">Height: <input name="height" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">Weight: <input name="weight" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">Age: <input name="age" type="number" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">PPG: <input name="ppg" type="number" step="any" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">FG%: <input name="fg" type="number" step="any" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">APG: <input name="assists" type="number" step="any" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">RPG: <input name="rebounds" type="number" step="any" style="padding:0.4em;margin-top:0.2em;"></label>
+          <button type="submit" style="margin-top:1em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:1em;cursor:pointer;">Add</button>
         </form>
       `;
       modal.style.display = 'flex';
@@ -212,19 +240,19 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!modal) return;
       const container = modal.querySelector('.player-stats');
       container.innerHTML = `
-        <h3>Edit Player</h3>
-        <form id="edit-player-form">
-          <label>Name: <input name="name" value="${player.name}" required></label><br>
-          <label>Position: <input name="position" value="${player.position}"></label><br>
-          <label>Number: <input name="number" type="number" value="${player.number}"></label><br>
-          <label>Height: <input name="height" value="${player.height}"></label><br>
-          <label>Weight: <input name="weight" value="${player.weight}"></label><br>
-          <label>Age: <input name="age" type="number" value="${player.age}"></label><br>
-          <label>PPG: <input name="ppg" type="number" step="any" value="${player.ppg}"></label><br>
-          <label>FG%: <input name="fg" type="number" step="any" value="${player.fg}"></label><br>
-          <label>APG: <input name="assists" type="number" step="any" value="${player.assists}"></label><br>
-          <label>RPG: <input name="rebounds" type="number" step="any" value="${player.rebounds}"></label><br>
-          <button type="submit">Save</button>
+        <h3 style="margin-bottom:1em;text-align:center;">Edit Player</h3>
+        <form id="edit-player-form" style="display:flex;flex-direction:column;gap:0.7em;max-width:350px;margin:auto;">
+          <label style="display:flex;flex-direction:column;font-weight:500;">Name: <input name="name" value="${player.name}" required style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">Position: <input name="position" value="${player.position}" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">Number: <input name="number" type="number" value="${player.number}" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">Height: <input name="height" value="${player.height}" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">Weight: <input name="weight" value="${player.weight}" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">Age: <input name="age" type="number" value="${player.age}" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">PPG: <input name="ppg" type="number" step="any" value="${player.ppg}" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">FG%: <input name="fg" type="number" step="any" value="${player.fg}" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">APG: <input name="assists" type="number" step="any" value="${player.assists}" style="padding:0.4em;margin-top:0.2em;"></label>
+          <label style="display:flex;flex-direction:column;font-weight:500;">RPG: <input name="rebounds" type="number" step="any" value="${player.rebounds}" style="padding:0.4em;margin-top:0.2em;"></label>
+          <button type="submit" style="margin-top:1em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:1em;cursor:pointer;">Save</button>
         </form>
       `;
       modal.style.display = 'flex';
@@ -254,13 +282,31 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.target.classList.contains('edit-team-btn')) {
       const teamId = e.target.getAttribute('data-team');
       const team = teams.find(t => t._id === teamId);
-      const newName = prompt('Team name', team.name);
-      if (!newName) return;
-      try {
-        await updateTeam(teamId, { ...team, name: newName });
-        teams = await fetchTeams();
-        rerenderTeamInfo(teamId);
-      } catch (err) { console.error(err); alert('Failed to update team'); }
+      const modal = document.getElementById('player-modal');
+      if (!modal) return;
+      const container = modal.querySelector('.player-stats');
+      container.innerHTML = `
+        <h3 style="margin-bottom:1em;text-align:center;">Edit Team</h3>
+        <form id="edit-team-form" style="display:flex;flex-direction:column;gap:0.7em;max-width:350px;margin:auto;">
+          <label style="display:flex;flex-direction:column;font-weight:500;">Team Name: <input name="name" value="${team.name}" required style="padding:0.4em;margin-top:0.2em;"></label>
+          <button type="submit" style="margin-top:1em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:1em;cursor:pointer;">Save</button>
+        </form>
+      `;
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      const form = container.querySelector('#edit-team-form');
+      form.onsubmit = async function(ev) {
+        ev.preventDefault();
+        const formData = new FormData(form);
+        const payload = { ...team, name: formData.get('name') };
+        try {
+          await updateTeam(teamId, payload);
+          teams = await fetchTeams();
+          rerenderTeamInfo(teamId);
+          modal.style.display = 'none';
+          document.body.style.overflow = '';
+        } catch (err) { console.error(err); alert('Failed to update team'); }
+      };
     }
 
     if (e.target.classList.contains('delete-team-btn')) {
