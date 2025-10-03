@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/style.css" />
+    <title>Home</title>
+  </head>
+  <body>
+    <header>
+      <h1>Locked In League</h1>
+      <nav>
+        <ul>
+          <li><a href="#boxscore" id="nav-boxscore">Box Score</a></li>
+          <li><a href="#roster" id="nav-roster">Team Roster</a></li>
+          <li><a href="#team-info" id="nav-team-info">Team Info</a></li>
+          <li><a href="#player-info" id="nav-player-info">Player Info</a></li>
+          <li><a href="#league-info" id="nav-league-info">League Info</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <section id="boxscore" class="content-section">
+        <h2>Box Score</h2>
+        <div id="boxscore-content"></div>
+      </section>
+      <section id="roster" class="content-section" style="display: none">
+        <h2>Team Roster</h2>
+        <div id="roster-content"></div>
+      </section>
+      <section id="team-info" class="content-section" style="display: none">
+        <h2>Team Info</h2>
+        <div id="team-info-content"></div>
+      </section>
+      <section id="player-info" class="content-section" style="display: none">
+        <h2>Player Info</h2>
+        <div id="player-info-content"></div>
+      </section>
+      <section id="league-info" class="content-section" style="display: none">
+        <h2>League Info</h2>
+        <div id="league-info-content"></div>
+      </section>
+    </main>
+
+    <!-- Player Info Modal -->
+    <div
+      id="player-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          background: #fff;
+          padding: 2em;
+          border-radius: 8px;
+          min-width: 300px;
+          max-width: 90vw;
+          position: relative;
+        "
+      >
+        <button
+          id="close-player-modal"
+          style="position: absolute; top: 0.5em; right: 0.5em; font-size: 1.2em"
+        >
+          &times;
+        </button>
+        <div class="player-stats"></div>
+      </div>
+    </div>
+    <script src="js/script.js"></script>
+  </body>
+</html>
