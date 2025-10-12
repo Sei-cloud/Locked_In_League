@@ -80,7 +80,7 @@ router.delete('/:id/players/:playerId', async (req, res, next) => {
     if (!team) return res.status(404).json({ error: 'Team not found' });
     const player = team.roster.id(req.params.playerId);
     if (!player) return res.status(404).json({ error: 'Player not found' });
-    player.remove();
+     team.roster.pull(player._id);
     await team.save();
     res.json(team);
   } catch (err) { next(err); }
