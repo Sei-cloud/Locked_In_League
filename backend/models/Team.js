@@ -17,6 +17,7 @@ const PlayerSchema = new mongoose.Schema({
 const TeamSchema = new mongoose.Schema({
   name: { type: String, required: true },
   roster: { type: [PlayerSchema], default: [] },
+  year: { type: Number, required: true },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Team', TeamSchema);
