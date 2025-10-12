@@ -296,39 +296,55 @@ document.addEventListener("DOMContentLoaded", () => {
     openModal(html);
   }
 
-  // -------------------------
-  // Season Page
-  // -------------------------
-  const seasonSection = document.getElementById("season");
-  const seasonSelect = document.getElementById("season-page-select");
-  const seasonInfoBlock = document.getElementById("season-info-block");
+// -------------------------
+// Season Page
+// -------------------------
+const seasonSelect = document.getElementById("season-page-select");
+const seasonInfoBlock = document.getElementById("season-info-block");
 
-  function renderSeasonPage() {
-    if (!seasonSelect || !seasonInfoBlock) return;
-    const seasons = [...new Set(teams.map((t) => t.year))].sort((a, b) => b - a);
-    if (seasons.length === 0) {
-      seasonInfoBlock.innerHTML = "<p>No seasons available.</p>";
-      return;
-    }
-    seasonSelect.innerHTML = seasons.map((s) => `<option value="${s}">${s}</option>`).join("");
-    let selected = seasonSelect.value || seasons[0];
-    seasonSelect.value = selected;
+function renderSeasonPage() {
+  if (!seasonSelect || !seasonInfoBlock) return;
 
-    const filtered = teams.filter((t) => t.year == selected);
-    let html = `<h3>Teams for Season ${selected}</h3>`;
-    html += filtered.length
-      ? `<ul style="margin-top:1em;">${filtered.map((t) => `<li><strong>${t.name}</strong> (${t.city || ""}) - Year: ${t.year} [${t.roster.length} players]</li>`).join("")}</ul>`
-      : "<p>No teams for this season.</p>";
-
-    seasonInfoBlock.innerHTML = html;
+  const seasons = [...new Set(teams.map((t) => t.year))].sort((a, b) => b - a);
+  if (seasons.length === 0) {
+    seasonInfoBlock.innerHTML = "<p>No seasons available.</p>";
+    return;
   }
 
-  if (seasonSelect) seasonSelect.addEventListener("change", renderSeasonPage);
-  document.getElementById("nav-season")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    showSection("season");
-    renderSeasonPage();
-  });
+  // Populate dropdown once
+  seasonSelect.innerHTML = seasons
+    .map((s) => `<option value="${s}">${s}</option>`)
+    .join("");
+
+  // Display teams for currently selected value
+  displayTeamsForSeason(seasonSelect.value || seasons[0]);
+}
+
+// Only update team list on change, don't repopulate dropdown
+seasonSelect?.addEventListener("change", (e) => {
+  displayTeamsForSeason(e.target.value);
+});
+
+function displayTeamsForSeason(year) {
+  const filtered = teams.filter((t) => t.year == year);
+  let html = `<h3>Teams for Season ${year}</h3>`;
+  if (filtered.length === 0) {
+    html += "<p>No teams for this season.</p>";
+  } else {
+    html += `<ul style="margin-top:1em;">${filtered
+      .map((t) => `<li><strong>${t.name}</strong> (${t.city || ""}) - Year: ${t.year} [${t.roster.length} players]</li>`)
+      .join("")}</ul>`;
+  }
+  seasonInfoBlock.innerHTML = html;
+}
+
+// Show season page from nav
+document.getElementById("nav-season")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  showSection("season"); // your function to hide other sections
+  renderSeasonPage(); // only populate dropdown once
+});
+
 
   // -------------------------
   // Add Team Button
