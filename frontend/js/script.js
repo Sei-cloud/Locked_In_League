@@ -1,5 +1,51 @@
 // public/js/script.js (or js/script.js)
 document.addEventListener("DOMContentLoaded", function () {
+  // Hide season page by default unless lastSection is 'season'
+  const seasonSection = document.getElementById('season');
+  if (seasonSection) {
+    seasonSection.style.display = (localStorage.getItem("lockedInLeagueLastSection") === "season") ? "" : "none";
+  }
+  // --- Season Page Logic ---
+  const seasonPageSelect = document.getElementById('season-page-select');
+  const seasonInfoBlock = document.getElementById('season-info-block');
+
+  function renderSeasonPage() {
+    if (!seasonPageSelect || !seasonInfoBlock) return;
+    // Get all unique seasons
+    const seasons = [...new Set(teams.map(t => t.seasonYear))].sort((a,b) => b-a);
+    seasonPageSelect.innerHTML = seasons.map(season => `<option value="${season}">${season}</option>`).join('');
+    let selected = seasonPageSelect.value || seasons[0];
+    seasonPageSelect.value = selected;
+    // Filter teams by selected season
+    const filteredTeams = teams.filter(t => t.seasonYear == selected);
+    let html = `<h3>Teams for Season ${selected}</h3>`;
+    if (filteredTeams.length === 0) {
+      html += '<p>No teams for this season.</p>';
+    } else {
+      html += '<ul style="margin-top:1em;">';
+      filteredTeams.forEach(team => {
+        html += `<li><strong>${team.name}</strong> (${team.city || ''}) - Coach: ${team.coach || ''} [${team.roster.length} players]</li>`;
+      });
+      html += '</ul>';
+    }
+    seasonInfoBlock.innerHTML = html;
+  }
+
+  if (seasonPageSelect) {
+    seasonPageSelect.addEventListener('change', renderSeasonPage);
+  }
+
+  // --- Navigation logic for season page ---
+  const navSeason = document.getElementById('nav-season');
+  if (navSeason) {
+    navSeason.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('.content-section').forEach(sec => sec.style.display = 'none');
+      document.getElementById('season').style.display = '';
+      renderSeasonPage();
+      localStorage.setItem("lockedInLeagueLastSection", "season");
+    });
+  }
   // Add Team button and modal logic
   document.getElementById('add-team-btn').addEventListener('click', () => {
     const modal = document.getElementById('player-modal');
@@ -37,6 +83,10 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("nav-" + section)?.addEventListener("click", function(e) {
       e.preventDefault();
       sections.forEach(sec => document.getElementById(sec).style.display = (sec === section) ? "" : "none");
+      // Hide season page content if navigating away
+      if (section !== "season") {
+        document.getElementById('season').style.display = 'none';
+      }
       localStorage.setItem("lockedInLeagueLastSection", section);
     });
   });

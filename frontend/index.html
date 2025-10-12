@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles/style.css" />
+    <link rel="stylesheet" href="./styles/style.css" />
     <title>Home</title>
   </head>
   <body>
@@ -16,6 +16,7 @@
           <li><a href="#team-info" id="nav-team-info">Team Info</a></li>
           <li><a href="#player-info" id="nav-player-info">Player Info</a></li>
           <li><a href="#league-info" id="nav-league-info">League Info</a></li>
+          <li><a href="#season" id="nav-season">Season</a></li>
         </ul>
       </nav>
     </header>
@@ -24,22 +25,49 @@
         <h2>Box Score</h2>
         <div id="boxscore-content"></div>
       </section>
+
       <section id="roster" class="content-section" style="display: none">
         <h2>Team Roster</h2>
         <div id="roster-content"></div>
       </section>
+
       <section id="team-info" class="content-section" style="display: none">
-  <h2>Team Info</h2>
-  <button id="add-team-btn" style="margin-bottom:1em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:1em;cursor:pointer;">Add Team</button>
-  <div id="team-info-content"></div>
+        <h2>Team Info</h2>
+        <button
+          id="add-team-btn"
+          style="
+            margin-bottom: 1em;
+            padding: 0.6em 1.2em;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+          "
+        >
+          Add Team
+        </button>
+        <div id="team-info-content"></div>
       </section>
+
       <section id="player-info" class="content-section" style="display: none">
         <h2>Player Info</h2>
         <div id="player-info-content"></div>
       </section>
+
       <section id="league-info" class="content-section" style="display: none">
         <h2>League Info</h2>
         <div id="league-info-content"></div>
+      </section>
+
+      <section id="season" class="content-section">
+        <h2>Season</h2>
+        <div style="margin-bottom:1em;display:flex;align-items:center;gap:1em;">
+          <label for="season-page-select" style="font-weight:500;">Select Season:</label>
+          <select id="season-page-select" style="padding:0.4em 1em;font-size:1em;border-radius:4px;"></select>
+        </div>
+        <div id="season-info-block"></div>
       </section>
     </main>
 
@@ -78,6 +106,6 @@
         <div class="player-stats"></div>
       </div>
     </div>
-    <script src="js/script.js"></script>
+    <script src="./js/script.js"></script>
   </body>
 </html>
