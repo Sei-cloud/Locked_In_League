@@ -63,10 +63,29 @@
 
       <section id="season" class="content-section">
         <h2>Season</h2>
-        <div style="margin-bottom:1em;display:flex;align-items:center;gap:1em;">
-          <label for="season-page-select" style="font-weight:500;">Select Season:</label>
-          <select id="season-page-select" style="padding:0.4em 1em;font-size:1em;border-radius:4px;"></select>
+        <div
+          style="
+            margin-bottom: 1em;
+            display: flex;
+            align-items: center;
+            gap: 1em;
+          "
+        >
+          <label for="season-page-select" style="font-weight: 500"
+            >Select Season:</label
+          >
+          <select
+            id="season-page-select"
+            style="padding: 0.4em 1em; font-size: 1em; border-radius: 4px"
+          ></select>
         </div>
+
+        <button id="add-game-btn" style="margin: 1em 0; padding: 0.5em 1em">
+          Add Game
+        </button>
+
+        <div id="season-games-list"></div>
+
         <div id="season-info-block"></div>
       </section>
     </main>
@@ -106,6 +125,31 @@
         <div class="player-stats"></div>
       </div>
     </div>
+
+    <div id="stats-modal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span id="close-stats-modal" class="close">&times;</span>
+        <div id="stats-modal-body"></div>
+      </div>
+    </div>
+    <!-- Game Modal -->
+    <div id="game-modal" style="display: none">
+      <form id="add-game-form">
+        <label
+          >Home Team:
+          <select id="add-home-team"></select>
+        </label>
+        <label
+          >Away Team:
+          <select id="add-away-team"></select>
+        </label>
+        <label>Home Score: <input type="number" id="add-home-score" /></label>
+        <label>Away Score: <input type="number" id="add-away-score" /></label>
+        <button type="submit">Add Game</button>
+      </form>
+      <button id="close-game-modal">Close</button>
+    </div>
+
     <script src="./js/script.js"></script>
   </body>
 </html>

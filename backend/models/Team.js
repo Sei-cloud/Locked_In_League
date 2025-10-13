@@ -20,4 +20,8 @@ const TeamSchema = new mongoose.Schema({
   year: { type: Number, required: true },
 }, { timestamps: true });
 
+
+
+
+
 module.exports = mongoose.model('Team', TeamSchema);

@@ -5,6 +5,8 @@ const cors = require('cors');
 const path = require('path');
 
 const teamsRouter = require('./routes/teamRoutes'); // adjust path
+const gameRoutes = require('./routes/games');
+
 
 const app = express();
 app.use(cors());
@@ -12,6 +14,7 @@ app.use(express.json());
 
 // API routes
 app.use('/api/teams', teamsRouter);
+app.use('/api/games', gameRoutes);
 
 // Serve frontend (plain HTML/JS/CSS)
 app.use(express.static(path.join(__dirname, '../frontend')));
