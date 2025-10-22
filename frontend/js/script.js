@@ -11,10 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   sections.forEach((section) => {
     const nav = document.getElementById("nav-" + section);
-    if (nav) nav.addEventListener("click", (e) => {
-      e.preventDefault();
-      showSection(section);
-    });
+    if (nav)
+      nav.addEventListener("click", (e) => {
+        e.preventDefault();
+        showSection(section);
+      });
   });
 
   function showSection(section) {
@@ -30,28 +31,42 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------
   const api = {
     getTeams: async () => (await fetch(`${API_BASE}/api/teams`)).json(),
-    createTeam: async (team) => (await fetch(`${API_BASE}/api/teams`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(team)
-    })).json(),
-    updateTeam: async (id, payload) => (await fetch(`${API_BASE}/api/teams/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    })).json(),
-    deleteTeam: async (id) => (await fetch(`${API_BASE}/api/teams/${id}`, { method: "DELETE" })).json(),
-    addPlayer: async (teamId, player) => (await fetch(`${API_BASE}/api/teams/${teamId}/players`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(player)
-    })).json(),
-    updatePlayer: async (teamId, playerId, payload) => (await fetch(`${API_BASE}/api/teams/${teamId}/players/${playerId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    })).json(),
-    deletePlayer: async (teamId, playerId) => (await fetch(`${API_BASE}/api/teams/${teamId}/players/${playerId}`, { method: "DELETE" })).json(),
+    createTeam: async (team) =>
+      (
+        await fetch(`${API_BASE}/api/teams`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(team),
+        })
+      ).json(),
+    updateTeam: async (id, payload) =>
+      (
+        await fetch(`${API_BASE}/api/teams/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+      ).json(),
+    deleteTeam: async (id) =>
+      (await fetch(`${API_BASE}/api/teams/${id}`, { method: "DELETE" })).json(),
+    addPlayer: async (teamId, player) =>
+      (
+        await fetch(`${API_BASE}/api/teams/${teamId}/players`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(player),
+        })
+      ).json(),
+    updatePlayer: async (teamId, playerId, payload) =>
+      (
+        await fetch(`${API_BASE}/api/teams/${teamId}/players/${playerId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+      ).json(),
+    deletePlayer: async (teamId, playerId) =>
+      (await fetch(`${API_BASE}/api/teams/${teamId}/players/${playerId}`, { method: "DELETE" })).json(),
   };
 
   // -------------------------
@@ -77,21 +92,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function showPlayerModal(teamId, playerId) {
-    const team = teams.find(t => t._id === teamId);
-    const player = team?.roster.find(p => p._id === playerId);
+    const team = teams.find((t) => t._id === teamId);
+    const player = team?.roster.find((p) => p._id === playerId);
     if (!player) return;
 
     const html = `
-      <h3>${player.name}</h3>
-      <ul class="player-stats">
-        <li><strong>Position:</strong> ${player.position}</li>
-        <li><strong>Height:</strong> ${player.height}</li>
-        <li><strong>Weight:</strong> ${player.weight}</li>
-        <li><strong>Age:</strong> ${player.age}</li>
-        <li><strong>PPG:</strong> ${player.ppg}</li>
-        <li><strong>FG%:</strong> ${player.fg}</li>
-        <li><strong>APG:</strong> ${player.assists}</li>
-        <li><strong>RPG:</strong> ${player.rebounds}</li>
+      <div style="text-align:center;">
+        ${player.portrait ? `<img src="${player.portrait}" alt="${player.name}" style="width:120px;height:120px;object-fit:cover;border-radius:50%;margin-bottom:0.5em;">` : ""}
+        <h3>${player.name}</h3>
+      </div>
+      <ul class="player-stats" style="list-style:none;padding:0;">
+        <li><strong>Position:</strong> ${player.position || "N/A"}</li>
+        <li><strong>Height:</strong> ${player.height || "N/A"}</li>
+        <li><strong>Weight:</strong> ${player.weight || "N/A"}</li>
+        <li><strong>Age:</strong> ${player.age || "N/A"}</li>
+        <li><strong>PPG:</strong> ${player.ppg || "N/A"}</li>
+        <li><strong>FG%:</strong> ${player.fg || "N/A"}</li>
+        <li><strong>APG:</strong> ${player.assists || "N/A"}</li>
+        <li><strong>RPG:</strong> ${player.rebounds || "N/A"}</li>
       </ul>
     `;
     openModal(html);
@@ -116,9 +134,9 @@ document.addEventListener("DOMContentLoaded", () => {
     awaySelect.innerHTML = "";
 
     const season = seasonSelect.value;
-    const filteredTeams = teams.filter(t => t.year == season);
+    const filteredTeams = teams.filter((t) => t.year == season);
 
-    filteredTeams.forEach(team => {
+    filteredTeams.forEach((team) => {
       const opt1 = document.createElement("option");
       opt1.value = team._id;
       opt1.textContent = team.name;
@@ -152,18 +170,23 @@ document.addEventListener("DOMContentLoaded", () => {
         seasonGamesList.innerHTML = "<p>No games recorded yet.</p>";
         return;
       }
-      seasonGamesList.innerHTML = "<ul>" + games.map(g => {
-        const home = g.homeTeam?.name || "Home";
-        const away = g.awayTeam?.name || "Away";
-        return `<li>${home} (${g.homeScore}) vs ${away} (${g.awayScore})</li>`;
-      }).join("") + "</ul>";
+      seasonGamesList.innerHTML =
+        "<ul>" +
+        games
+          .map((g) => {
+            const home = g.homeTeam?.name || "Home";
+            const away = g.awayTeam?.name || "Away";
+            return `<li>${home} (${g.homeScore}) vs ${away} (${g.awayScore})</li>`;
+          })
+          .join("") +
+        "</ul>";
     } catch (err) {
       console.error(err);
       seasonGamesList.innerHTML = "<p>Error loading games</p>";
     }
   }
 
-  addGameForm.addEventListener("submit", async (e) => {
+  addGameForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const homeTeam = document.getElementById("add-home-team").value;
     const awayTeam = document.getElementById("add-away-team").value;
@@ -180,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`${API_BASE}/api/games`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ homeTeam, awayTeam, homeScore, awayScore, seasonYear })
+        body: JSON.stringify({ homeTeam, awayTeam, homeScore, awayScore, seasonYear }),
       });
       if (!res.ok) throw new Error("Failed to add game");
 
@@ -199,27 +222,39 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // -------------------------
-  // Team Page Rendering
+  // Team Rendering
   // -------------------------
   const teamInfoContent = document.getElementById("team-info-content");
 
   function rerenderTeams(expandTeamId = null) {
     teamInfoContent.innerHTML = "";
-    teams.forEach(team => {
+    teams.forEach((team) => {
       const teamDiv = document.createElement("div");
       teamDiv.className = "team-block";
 
-      const rosterHtml = team.roster.map(p => `
+      const logoHtml = team.logo
+        ? `<img src="${team.logo}" alt="${team.name} logo" style="width:40px;height:40px;object-fit:cover;border-radius:50%;margin-right:0.5em;">`
+        : "";
+
+      const rosterHtml = team.roster
+        .map(
+          (p) => `
         <li style="display:flex;align-items:center;gap:0.5rem;">
-          <span class="player-link" tabindex="0" data-team="${team._id}" data-player="${p._id}">#${p.number} ${p.name} - ${p.position}</span>
+          <span class="player-link" tabindex="0" data-team="${team._id}" data-player="${p._id}">
+            #${p.number} ${p.name} - ${p.position}
+          </span>
           <button class="edit-player-btn" data-team="${team._id}" data-player="${p._id}" style="font-size:0.9em;padding:0.1em 0.5em;">Edit</button>
           <button class="delete-player-btn" data-team="${team._id}" data-player="${p._id}" style="font-size:0.9em;padding:0.1em 0.5em;background:#e53935;color:#fff;">Delete</button>
         </li>
-      `).join("");
+      `
+        )
+        .join("");
 
       teamDiv.innerHTML = `
         <div class="team-header" tabindex="0" style="display:flex;align-items:center;justify-content:space-between;padding:0.5em 0.7em;">
-          <strong style="flex:1;text-align:left;">${team.name}</strong>
+          <div style="display:flex;align-items:center;gap:0.5em;flex:1;text-align:left;">
+            ${logoHtml}<strong>${team.name}</strong>
+          </div>
           <span class="expand-arrow" style="margin-left:auto;font-size:1.2em;cursor:pointer;">&#9654;</span>
         </div>
         <div class="team-roster" style="display:none;">
@@ -233,7 +268,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const header = teamDiv.querySelector(".team-header");
       const rosterDiv = teamDiv.querySelector(".team-roster");
       header.addEventListener("click", () => toggleRoster(rosterDiv, header));
-      header.addEventListener("keydown", (e) => { if (["Enter"," "].includes(e.key)) header.click(); });
+      header.addEventListener("keydown", (e) => {
+        if (["Enter", " "].includes(e.key)) header.click();
+      });
       if (expandTeamId && team._id === expandTeamId) toggleRoster(rosterDiv, header, true);
 
       teamInfoContent.appendChild(teamDiv);
@@ -242,8 +279,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function toggleRoster(rosterDiv, header, forceOpen = false) {
     const isOpen = rosterDiv.style.display === "";
-    document.querySelectorAll(".team-roster").forEach(el => el.style.display = "none");
-    document.querySelectorAll(".expand-arrow").forEach(el => el.innerHTML = "&#9654;");
+    document.querySelectorAll(".team-roster").forEach((el) => (el.style.display = "none"));
+    document.querySelectorAll(".expand-arrow").forEach((el) => (el.innerHTML = "&#9654;"));
     if (!isOpen || forceOpen) {
       rosterDiv.style.display = "";
       header.querySelector(".expand-arrow").innerHTML = "&#9660;";
@@ -270,8 +307,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Player Form
   // -------------------------
   async function handlePlayerForm(type, teamId, playerId = null) {
-    const team = teams.find(t => t._id === teamId);
-    const player = playerId ? team.roster.find(p => p._id === playerId) : null;
+    const team = teams.find((t) => t._id === teamId);
+    const player = playerId ? team.roster.find((p) => p._id === playerId) : null;
 
     const html = `
       <h3 style="margin-bottom:1em;text-align:center;">${type === "add" ? "Add Player" : "Edit Player"}</h3>
@@ -286,7 +323,8 @@ document.addEventListener("DOMContentLoaded", () => {
           { label:"PPG", name:"ppg", value:player?.ppg||"", type:"number", step:"any" },
           { label:"FG%", name:"fg", value:player?.fg||"", type:"number", step:"any" },
           { label:"APG", name:"assists", value:player?.assists||"", type:"number", step:"any" },
-          { label:"RPG", name:"rebounds", value:player?.rebounds||"", type:"number", step:"any" }
+          { label:"RPG", name:"rebounds", value:player?.rebounds||"", type:"number", step:"any" },
+          { label:"Portrait URL", name:"portrait", value:player?.portrait||"", type:"text" },
         ].map(f => `<label style="display:flex;flex-direction:column;font-weight:500;">${f.label}: <input name="${f.name}" value="${f.value}" ${f.required?"required":""} ${f.step?`step="${f.step}"`:''} type="${f.type}" style="padding:0.4em;margin-top:0.2em;"></label>`).join("")}
         <button type="submit" style="margin-top:1em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:1em;cursor:pointer;">${type==="add"?"Add":"Save"}</button>
       </form>
@@ -317,15 +355,46 @@ document.addEventListener("DOMContentLoaded", () => {
   // Team Form
   // -------------------------
   async function handleTeamForm(type, teamId = null) {
-    const team = type==="edit"?teams.find(t=>t._id===teamId):null;
+    const team = type === "edit" ? teams.find((t) => t._id === teamId) : null;
     const html = `
-      <h3 style="margin-bottom:1em;text-align:center;">${type==="edit"?"Edit Team":"Add Team"}</h3>
-      <form id="${type}-team-form" style="display:flex;flex-direction:column;gap:0.7em;max-width:350px;margin:auto;">
-        <label style="display:flex;flex-direction:column;font-weight:500;">Team Name: <input name="name" value="${team?.name||""}" required style="padding:0.4em;margin-top:0.2em;"></label>
-        <label style="display:flex;flex-direction:column;font-weight:500;">Season Year: <input name="year" type="number" value="${team?.year||""}" required style="padding:0.4em;margin-top:0.2em;"></label>
-        <button type="submit" style="margin-top:1em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:1em;cursor:pointer;">Save</button>
-      </form>
-    `;
+  <h3 style="margin-bottom:1em;text-align:center;">
+    ${type === "edit" ? "Edit Team" : "Add Team"}
+  </h3>
+  <form id="${type}-team-form"
+        style="display:flex;flex-direction:column;gap:0.7em;max-width:350px;margin:auto;">
+    
+    <label style="display:flex;flex-direction:column;font-weight:500;">
+      Team Name:
+      <input name="name"
+             value="${team?.name || ""}"
+             required
+             style="padding:0.4em;margin-top:0.2em;">
+    </label>
+    
+    <label style="display:flex;flex-direction:column;font-weight:500;">
+      Season Year:
+      <input name="year"
+             type="number"
+             value="${team?.year || ""}"
+             required
+             style="padding:0.4em;margin-top:0.2em;">
+    </label>
+    
+    <label style="display:flex;flex-direction:column;font-weight:500;">
+      Team Logo URL:
+      <input name="logo"
+             type="text"
+             placeholder="https://example.com/logo.png"
+             value="${team?.logo || ""}"
+             style="padding:0.4em;margin-top:0.2em;">
+    </label>
+
+    <button type="submit"
+            style="margin-top:1em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:1em;cursor:pointer;">
+      Save
+    </button>
+  </form>
+`;
     openModal(html);
 
     const form = playerModalContent.querySelector(`#${type}-team-form`);
@@ -335,13 +404,13 @@ document.addEventListener("DOMContentLoaded", () => {
       data.year = Number(data.year);
       data.roster = team?.roster || [];
       try {
-        if(type==="edit") await api.updateTeam(teamId,data);
+        if (type === "edit") await api.updateTeam(teamId, data);
         else await api.createTeam(data);
         teams = await api.getTeams();
         rerenderTeams();
         closeModal();
         renderSeasonPage();
-      } catch(err) {
+      } catch (err) {
         console.error(err);
         alert("Failed to save team");
       }
@@ -352,55 +421,66 @@ document.addEventListener("DOMContentLoaded", () => {
   // Delete Handlers
   // -------------------------
   async function deletePlayerConfirm(teamId, playerId) {
-    if(!confirm("Delete this player?")) return;
+    if (!confirm("Delete this player?")) return;
     try {
-      await api.deletePlayer(teamId,playerId);
+      await api.deletePlayer(teamId, playerId);
       teams = await api.getTeams();
       rerenderTeams(teamId);
-    } catch(err){ console.error(err); alert("Failed to delete player"); }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete player");
+    }
   }
 
   async function deleteTeamConfirm(teamId) {
-    if(!confirm("Delete this team?")) return;
+    if (!confirm("Delete this team?")) return;
     try {
       await api.deleteTeam(teamId);
       teams = await api.getTeams();
       rerenderTeams();
       renderSeasonPage();
-    } catch(err){ console.error(err); alert("Failed to delete team"); }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete team");
+    }
   }
 
   // -------------------------
   // Season Page
   // -------------------------
   function renderSeasonPage() {
-    if(!seasonSelect || !seasonInfoBlock) return;
-    const seasons = [...new Set(teams.map(t=>t.year))].sort((a,b)=>b-a);
-    if(seasons.length===0){ seasonInfoBlock.innerHTML="<p>No seasons available.</p>"; return; }
-    seasonSelect.innerHTML = seasons.map(s=>`<option value="${s}">${s}</option>`).join("");
+    if (!seasonSelect || !seasonInfoBlock) return;
+    const seasons = [...new Set(teams.map((t) => t.year))].sort((a, b) => b - a);
+    if (seasons.length === 0) {
+      seasonInfoBlock.innerHTML = "<p>No seasons available.</p>";
+      return;
+    }
+    seasonSelect.innerHTML = seasons.map((s) => `<option value="${s}">${s}</option>`).join("");
     loadSeasonGames(seasonSelect.value || seasons[0]);
   }
 
-  document.getElementById("nav-season")?.addEventListener("click",(e)=>{
-    e.preventDefault(); showSection("season"); renderSeasonPage();
+  document.getElementById("nav-season")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showSection("season");
+    renderSeasonPage();
   });
 
   // -------------------------
   // Add Team Button
   // -------------------------
-  document.getElementById("add-team-btn")?.addEventListener("click",()=>handleTeamForm("add"));
+  document.getElementById("add-team-btn")?.addEventListener("click", () => handleTeamForm("add"));
 
   // -------------------------
   // Init
   // -------------------------
   async function init() {
-    try{
+    try {
       teams = await api.getTeams();
       rerenderTeams();
       renderSeasonPage();
       showSection(lastSection);
-    } catch(err){
-      console.error("Failed to load teams:",err);
+    } catch (err) {
+      console.error("Failed to load teams:", err);
     }
   }
 

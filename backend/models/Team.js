@@ -12,10 +12,12 @@ const PlayerSchema = new mongoose.Schema({
   fg: Number,
   assists: Number,
   rebounds: Number,
+  portrait: { type: String, default: '' },
 }, { _id: true }); // each player has its own _id
 
 const TeamSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  logo: { type: String, default: '' },
   roster: { type: [PlayerSchema], default: [] },
   year: { type: Number, required: true },
 }, { timestamps: true });
