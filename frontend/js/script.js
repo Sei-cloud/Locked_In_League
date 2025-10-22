@@ -1,13 +1,22 @@
 // public/js/script.js
 document.addEventListener("DOMContentLoaded", () => {
-  const API_BASE = window.location.hostname === "localhost" ? "http://localhost:4000" : "";
+  const API_BASE =
+    window.location.hostname === "localhost" ? "http://localhost:4000" : "";
   let teams = [];
 
   // -------------------------
   // Section Navigation
   // -------------------------
-  const sections = ["boxscore", "roster", "team-info", "player-info", "league-info", "season"];
-  let lastSection = localStorage.getItem("lockedInLeagueLastSection") || "boxscore";
+  const sections = [
+    "boxscore",
+    "roster",
+    "team-info",
+    "player-info",
+    "league-info",
+    "season",
+  ];
+  let lastSection =
+    localStorage.getItem("lockedInLeagueLastSection") || "boxscore";
 
   sections.forEach((section) => {
     const nav = document.getElementById("nav-" + section);
@@ -66,17 +75,27 @@ document.addEventListener("DOMContentLoaded", () => {
         })
       ).json(),
     deletePlayer: async (teamId, playerId) =>
-      (await fetch(`${API_BASE}/api/teams/${teamId}/players/${playerId}`, { method: "DELETE" })).json(),
+      (
+        await fetch(`${API_BASE}/api/teams/${teamId}/players/${playerId}`, {
+          method: "DELETE",
+        })
+      ).json(),
   };
 
   // -------------------------
   // Player Modal
   // -------------------------
   const playerModal = document.getElementById("player-modal");
-  const playerModalContent = playerModal.querySelector(".player-stats");
+  const playerModalContent = document.querySelector(
+    "#player-modal .player-modal-body"
+  );
 
   function openModal(html) {
-    playerModalContent.innerHTML = html;
+    const playerModal = document.getElementById("player-modal");
+
+    // Put the HTML inside the modal body
+    playerModal.querySelector(".player-modal-body").innerHTML = html;
+
     playerModal.style.display = "flex";
     document.body.style.overflow = "hidden";
   }
@@ -86,7 +105,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.overflow = "";
   }
 
-  document.getElementById("close-player-modal").addEventListener("click", closeModal);
+  document
+    .getElementById("close-player-modal")
+    .addEventListener("click", closeModal);
   playerModal.addEventListener("click", (e) => {
     if (e.target === playerModal) closeModal();
   });
@@ -96,22 +117,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const player = team?.roster.find((p) => p._id === playerId);
     if (!player) return;
 
+    // Fallback image
+    const imgSrc =
+      player.portrait && player.portrait.trim() !== ""
+        ? player.portrait
+        : "/assets/default-portrait.png";
+
     const html = `
-      <div style="text-align:center;">
-        ${player.portrait ? `<img src="${player.portrait}" alt="${player.name}" style="width:120px;height:120px;object-fit:cover;border-radius:50%;margin-bottom:0.5em;">` : ""}
-        <h3>${player.name}</h3>
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1.5em;">
+      <div style="flex:1;">
+        <h3 style="margin-top:0;">${player.name}</h3>
+        <ul style="list-style:none; padding:0; margin:0;">
+          <li><strong>Position:</strong> ${player.position || "N/A"}</li>
+          <li><strong>Height:</strong> ${player.height || "N/A"}</li>
+          <li><strong>Weight:</strong> ${player.weight || "N/A"}</li>
+          <li><strong>Age:</strong> ${player.age || "N/A"}</li>
+          <li><strong>PPG:</strong> ${player.ppg || "N/A"}</li>
+          <li><strong>FG%:</strong> ${player.fg || "N/A"}</li>
+          <li><strong>APG:</strong> ${player.assists || "N/A"}</li>
+          <li><strong>RPG:</strong> ${player.rebounds || "N/A"}</li>
+        </ul>
       </div>
-      <ul class="player-stats" style="list-style:none;padding:0;">
-        <li><strong>Position:</strong> ${player.position || "N/A"}</li>
-        <li><strong>Height:</strong> ${player.height || "N/A"}</li>
-        <li><strong>Weight:</strong> ${player.weight || "N/A"}</li>
-        <li><strong>Age:</strong> ${player.age || "N/A"}</li>
-        <li><strong>PPG:</strong> ${player.ppg || "N/A"}</li>
-        <li><strong>FG%:</strong> ${player.fg || "N/A"}</li>
-        <li><strong>APG:</strong> ${player.assists || "N/A"}</li>
-        <li><strong>RPG:</strong> ${player.rebounds || "N/A"}</li>
-      </ul>
-    `;
+      <div style="flex-shrink:0;">
+        <img src="${imgSrc}" alt="${
+      player.name
+    }" style="width:150px; height:150px; object-fit:cover; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+      </div>
+    </div>
+  `;
+
     openModal(html);
   }
 
@@ -203,7 +237,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`${API_BASE}/api/games`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ homeTeam, awayTeam, homeScore, awayScore, seasonYear }),
+        body: JSON.stringify({
+          homeTeam,
+          awayTeam,
+          homeScore,
+          awayScore,
+          seasonYear,
+        }),
       });
       if (!res.ok) throw new Error("Failed to add game");
 
@@ -271,7 +311,8 @@ document.addEventListener("DOMContentLoaded", () => {
       header.addEventListener("keydown", (e) => {
         if (["Enter", " "].includes(e.key)) header.click();
       });
-      if (expandTeamId && team._id === expandTeamId) toggleRoster(rosterDiv, header, true);
+      if (expandTeamId && team._id === expandTeamId)
+        toggleRoster(rosterDiv, header, true);
 
       teamInfoContent.appendChild(teamDiv);
     });
@@ -279,8 +320,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function toggleRoster(rosterDiv, header, forceOpen = false) {
     const isOpen = rosterDiv.style.display === "";
-    document.querySelectorAll(".team-roster").forEach((el) => (el.style.display = "none"));
-    document.querySelectorAll(".expand-arrow").forEach((el) => (el.innerHTML = "&#9654;"));
+    document
+      .querySelectorAll(".team-roster")
+      .forEach((el) => (el.style.display = "none"));
+    document
+      .querySelectorAll(".expand-arrow")
+      .forEach((el) => (el.innerHTML = "&#9654;"));
     if (!isOpen || forceOpen) {
       rosterDiv.style.display = "";
       header.querySelector(".expand-arrow").innerHTML = "&#9660;";
@@ -295,12 +340,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const teamId = target.dataset.team;
     const playerId = target.dataset.player;
 
-    if (target.classList.contains("add-player-btn")) await handlePlayerForm("add", teamId);
-    if (target.classList.contains("edit-player-btn")) await handlePlayerForm("edit", teamId, playerId);
-    if (target.classList.contains("delete-player-btn")) await deletePlayerConfirm(teamId, playerId);
-    if (target.classList.contains("edit-team-btn")) await handleTeamForm("edit", teamId);
-    if (target.classList.contains("delete-team-btn")) await deleteTeamConfirm(teamId);
-    if (target.classList.contains("player-link")) showPlayerModal(teamId, playerId);
+    if (target.classList.contains("add-player-btn"))
+      await handlePlayerForm("add", teamId);
+    if (target.classList.contains("edit-player-btn"))
+      await handlePlayerForm("edit", teamId, playerId);
+    if (target.classList.contains("delete-player-btn"))
+      await deletePlayerConfirm(teamId, playerId);
+    if (target.classList.contains("edit-team-btn"))
+      await handleTeamForm("edit", teamId);
+    if (target.classList.contains("delete-team-btn"))
+      await deleteTeamConfirm(teamId);
+    if (target.classList.contains("player-link"))
+      showPlayerModal(teamId, playerId);
   });
 
   // -------------------------
@@ -308,43 +359,131 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------
   async function handlePlayerForm(type, teamId, playerId = null) {
     const team = teams.find((t) => t._id === teamId);
-    const player = playerId ? team.roster.find((p) => p._id === playerId) : null;
+    const player = playerId
+      ? team.roster.find((p) => p._id === playerId)
+      : null;
 
     const html = `
-      <h3 style="margin-bottom:1em;text-align:center;">${type === "add" ? "Add Player" : "Edit Player"}</h3>
-      <form id="${type}-player-form" style="display:flex;flex-direction:column;gap:0.7em;max-width:350px;margin:auto;">
-        ${[
-          { label:"Name", name:"name", value:player?.name||"", type:"text", required:true },
-          { label:"Position", name:"position", value:player?.position||"", type:"text" },
-          { label:"Number", name:"number", value:player?.number||"", type:"number" },
-          { label:"Height", name:"height", value:player?.height||"", type:"text" },
-          { label:"Weight", name:"weight", value:player?.weight||"", type:"number" },
-          { label:"Age", name:"age", value:player?.age||"", type:"number" },
-          { label:"PPG", name:"ppg", value:player?.ppg||"", type:"number", step:"any" },
-          { label:"FG%", name:"fg", value:player?.fg||"", type:"number", step:"any" },
-          { label:"APG", name:"assists", value:player?.assists||"", type:"number", step:"any" },
-          { label:"RPG", name:"rebounds", value:player?.rebounds||"", type:"number", step:"any" },
-          { label:"Portrait URL", name:"portrait", value:player?.portrait||"", type:"text" },
-        ].map(f => `<label style="display:flex;flex-direction:column;font-weight:500;">${f.label}: <input name="${f.name}" value="${f.value}" ${f.required?"required":""} ${f.step?`step="${f.step}"`:''} type="${f.type}" style="padding:0.4em;margin-top:0.2em;"></label>`).join("")}
-        <button type="submit" style="margin-top:1em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:1em;cursor:pointer;">${type==="add"?"Add":"Save"}</button>
-      </form>
-    `;
+    <h3 style="margin-bottom:1em;text-align:center;">${
+      type === "add" ? "Add Player" : "Edit Player"
+    }</h3>
+    <form id="${type}-player-form" style="display:flex;flex-direction:column;gap:0.7em;max-width:350px;margin:auto;">
+      ${[
+        {
+          label: "Name",
+          name: "name",
+          value: player?.name || "",
+          type: "text",
+          required: true,
+        },
+        {
+          label: "Position",
+          name: "position",
+          value: player?.position || "",
+          type: "text",
+        },
+        {
+          label: "Number",
+          name: "number",
+          value: player?.number || "",
+          type: "number",
+        },
+        {
+          label: "Height",
+          name: "height",
+          value: player?.height || "",
+          type: "text",
+        },
+        {
+          label: "Weight",
+          name: "weight",
+          value: player?.weight || "",
+          type: "number",
+        },
+        { label: "Age", name: "age", value: player?.age || "", type: "number" },
+        {
+          label: "PPG",
+          name: "ppg",
+          value: player?.ppg || "",
+          type: "number",
+          step: "any",
+        },
+        {
+          label: "FG%",
+          name: "fg",
+          value: player?.fg || "",
+          type: "number",
+          step: "any",
+        },
+        {
+          label: "APG",
+          name: "assists",
+          value: player?.assists || "",
+          type: "number",
+          step: "any",
+        },
+        {
+          label: "RPG",
+          name: "rebounds",
+          value: player?.rebounds || "",
+          type: "number",
+          step: "any",
+        },
+        {
+          label: "Portrait URL",
+          name: "portrait",
+          value: player?.portrait || "",
+          type: "text",
+        },
+      ]
+        .map(
+          (f) => `
+        <label style="display:flex;flex-direction:column;font-weight:500;">
+          ${f.label}:
+          <input name="${f.name}" value="${f.value}" ${
+            f.required ? "required" : ""
+          } ${f.step ? `step="${f.step}"` : ""} type="${
+            f.type
+          }" style="padding:0.4em;margin-top:0.2em;">
+        </label>
+      `
+        )
+        .join("")}
+      <button type="submit" style="margin-top:1em;padding:0.6em 1.2em;background:#1976d2;color:#fff;border:none;border-radius:4px;font-size:1em;cursor:pointer;">
+        ${type === "add" ? "Add" : "Save"}
+      </button>
+    </form>
+  `;
+
     openModal(html);
 
     const form = playerModalContent.querySelector(`#${type}-player-form`);
+    if (!form) {
+      console.error("Player form not found!");
+      return;
+    }
     form.onsubmit = async (ev) => {
       ev.preventDefault();
       const formData = Object.fromEntries(new FormData(form));
-      ["number","age","ppg","fg","assists","rebounds","weight"].forEach(f => {
-        if(formData[f]!==undefined) formData[f]=Number(formData[f]);
-      });
+
+      // Trim portrait URL
+      if (formData.portrait) formData.portrait = formData.portrait.trim();
+
+      ["number", "age", "ppg", "fg", "assists", "rebounds", "weight"].forEach(
+        (f) => {
+          if (formData[f] !== undefined) formData[f] = Number(formData[f]);
+        }
+      );
+
       try {
-        if(type==="add") await api.addPlayer(teamId, formData);
-        else await api.updatePlayer(teamId, playerId, { ...player, ...formData });
+        if (type === "add") await api.addPlayer(teamId, formData);
+        else
+          await api.updatePlayer(teamId, playerId, { ...player, ...formData });
+
         teams = await api.getTeams();
         rerenderTeams(teamId);
         closeModal();
-      } catch(err) {
+      } catch (err) {
         console.error(err);
         alert("Failed to save player");
       }
@@ -450,12 +589,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------
   function renderSeasonPage() {
     if (!seasonSelect || !seasonInfoBlock) return;
-    const seasons = [...new Set(teams.map((t) => t.year))].sort((a, b) => b - a);
+    const seasons = [...new Set(teams.map((t) => t.year))].sort(
+      (a, b) => b - a
+    );
     if (seasons.length === 0) {
       seasonInfoBlock.innerHTML = "<p>No seasons available.</p>";
       return;
     }
-    seasonSelect.innerHTML = seasons.map((s) => `<option value="${s}">${s}</option>`).join("");
+    seasonSelect.innerHTML = seasons
+      .map((s) => `<option value="${s}">${s}</option>`)
+      .join("");
     loadSeasonGames(seasonSelect.value || seasons[0]);
   }
 
@@ -468,7 +611,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------
   // Add Team Button
   // -------------------------
-  document.getElementById("add-team-btn")?.addEventListener("click", () => handleTeamForm("add"));
+  document
+    .getElementById("add-team-btn")
+    ?.addEventListener("click", () => handleTeamForm("add"));
 
   // -------------------------
   // Init

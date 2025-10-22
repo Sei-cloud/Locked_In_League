@@ -91,47 +91,30 @@
     </main>
 
     <!-- Player/Team Modal -->
-    <div
-      id="player-modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.6);
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-      "
-    >
-      <div
-        style="
-          background: #fff;
-          padding: 2em;
-          border-radius: 8px;
-          min-width: 300px;
-          max-width: 90vw;
-          position: relative;
-        "
-      >
-        <button
-          id="close-player-modal"
-          style="position: absolute; top: 0.5em; right: 0.5em; font-size: 1.2em"
-        >
-          &times;
-        </button>
-        <div class="player-stats"></div>
-      </div>
-    </div>
+    <div id="player-modal" class="modal-overlay">
+  <div class="player-modal-content">
+    <button id="close-player-modal" class="close-modal-btn">&times;</button>
 
-    <div id="stats-modal" class="modal" style="display: none">
-      <div class="modal-content">
-        <span id="close-stats-modal" class="close">&times;</span>
-        <div id="stats-modal-body"></div>
+    <div class="player-modal-body">
+      <div class="player-details">
+        <h3 id="player-name"></h3>
+        <p><strong>Position:</strong> <span id="player-position"></span></p>
+        <p><strong>Number:</strong> <span id="player-number"></span></p>
+        <p><strong>Height:</strong> <span id="player-height"></span></p>
+        <p><strong>Weight:</strong> <span id="player-weight"></span></p>
+        <p><strong>PPG:</strong> <span id="player-ppg"></span></p>
+        <p><strong>FG%:</strong> <span id="player-fg"></span></p>
+        <p><strong>Assists:</strong> <span id="player-assists"></span></p>
+        <p><strong>Rebounds:</strong> <span id="player-rebounds"></span></p>
+      </div>
+
+      <div class="player-image">
+        <img id="player-portrait" src="" alt="Player portrait" />
       </div>
     </div>
+  </div>
+</div>
+
     <!-- Game Modal -->
     <div id="game-modal" style="display: none">
       <form id="add-game-form">
